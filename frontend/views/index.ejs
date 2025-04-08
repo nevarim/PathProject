@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="icon" href="/images/pathfinder.ico" type="image/x-icon"> <!-- Favicon aggiunto -->
+    <title><%= process.env.REACT_APP_PROJECT_NAME %></title>
+  </head>
+<body>
+  <header class="main-header">
+        <div class="header-section left" id="auth-module">
+          <!-- Modulo Login -->
+          <div id="login-section" style="display: block;">
+            <h2>Login</h2>
+            <input type="text" id="username" placeholder="Username" required />
+            <input type="password" id="password" placeholder="Password" required />
+            <label>
+              <input type="checkbox" id="stay-connected" /> Mantieni la connessione
+            </label>
+            <button onclick="login()">Login</button>
+            <a href="#" id="show-register">Non hai un account? Registrati</a>
+          </div>
+          <!-- Modulo Logout -->
+          <div id="logout-section" style="display: none;">
+            <span>Benvenuto, <span id="user-display-name"></span></span>
+            <button onclick="logout()">Logout</button>
+          </div>
+        </div>
+        <div class="header-section center">
+          <h1><%= process.env.REACT_APP_PROJECT_NAME %></h1>
+        </div>
+        <div class="header-section right">
+          <div id="avatardid" class="avatar"></div>
+        </div>
+  </header>
+
+  <!-- Pop-up Registrazione -->
+  <div id="overlay"></div>
+  <div id="register-popup">
+    <h2>Registrazione</h2>
+    <input type="text" id="reg-username" placeholder="Username" required />
+    <input type="password" id="reg-password" placeholder="Password" required />
+    <button onclick="register()">Registrati</button>
+    <p id="close-register">Chiudi</p>
+  </div>
+
+  <!-- Pop-up Creazione Stanza -->
+  <div id="room-popup" style="display: none;">
+    <h2>Crea una Stanza</h2>
+    <input type="text" id="room-name" placeholder="Nome della stanza" required />
+    <textarea id="room-description" placeholder="Descrizione della stanza" required></textarea>
+    <div>
+      <label id="room-cover-label" for="room-cover">Carica copertina (opzionale)</label>
+      <input type="file" id="room-cover" accept="image/png" />
+      <span id="room-cover-name"></span>
+      <div id="room-cover-preview-container">
+        <img id="room-cover-preview" src="" alt="Anteprima immagine" style="display: none; max-width: 100%; height: auto; margin-top: 10px; border: 1px solid #ddd; border-radius: 5px;" />
+      </div>
+    </div>
+    <button onclick="createRoom()">Crea Stanza</button>
+    <p id="close-room-popup">Chiudi</p>
+  </div>
+
+
+<!-- Pop-up Modifica Stanza -->
+<div id="edit-room-popup" style="display: none;">
+  <h2>Modifica Stanza</h2>
+  
+  <!-- Input per il nome della stanza -->
+  <input type="text" id="edit-room-name" placeholder="Nome della stanza" required />
+  
+  <!-- Textarea per la descrizione -->
+  <textarea id="edit-room-description" placeholder="Descrizione della stanza" required></textarea>
+  
+  <!-- Sezione immagine -->
+<!-- Sezione immagine -->
+<div id="edit-room-image-container">
+  <img id="edit-room-image-preview" src="" alt="Anteprima immagine" style="display: none;" />
+  <label for="edit-room-cover">Carica una nuova copertina</label>
+  <input type="file" id="edit-room-cover" accept="image/png" onchange="updateImagePreview(this)" />
+  <span id="edit-room-cover-name">Nessun file selezionato</span>
+</div>
+  
+  <!-- Pulsanti per le azioni -->
+  <button onclick="closeEditRoomPopup()">Chiudi</button>
+  <button onclick="saveRoomChanges()">Salva</button>
+</div>
+
+  <main>
+    <button id="create-room-button" style="display: none;">+ Crea una Stanza</button>
+
+    <!-- Griglia dinamica delle stanze -->
+    <section id="rooms-container" style="display: none;">
+      <h2>Le tue stanze</h2>
+      <div class="room-grid" id="room-grid">
+        <!-- Le stanze saranno aggiunte qui dinamicamente -->
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>© <%= new Date().getFullYear() %> - <%= process.env.REACT_APP_PROJECT_NAME %>. Tutti i diritti riservati.</p>
+  </footer>
+
+  <script>
+    const BACKEND_URL = "http://loki:3000"; // Variabile globale disponibile per il frontend
+    console.log(`✔ Backend URL configurato: ${BACKEND_URL}`);
+</script>
+<script src="/js/index.js" defer></script> <!-- Include il file principale -->
+<script src="/js/app.js" defer></script> <!-- Include il file principale -->
+  <script>
+    // Mostrare/Nascondere pop-up di registrazione
+    document.getElementById('show-register').addEventListener('click', function (e) {
+      e.preventDefault();
+      document.getElementById('register-popup').style.display = 'block';
+      document.getElementById('overlay').style.display = 'block';
+    });
+
+    document.getElementById('close-register').addEventListener('click', function () {
+      document.getElementById('register-popup').style.display = 'none';
+      document.getElementById('overlay').style.display = 'none';
+    });
+
+    // Mostrare/Nascondere pop-up di creazione stanza
+    const roomButton = document.getElementById('create-room-button');
+    roomButton.addEventListener('click', function () {
+      document.getElementById('room-popup').style.display = 'block';
+      document.getElementById('overlay').style.display = 'block';
+    });
+
+    document.getElementById('close-room-popup').addEventListener('click', function () {
+      document.getElementById('room-popup').style.display = 'none';
+      document.getElementById('overlay').style.display = 'none';
+    });
+
+    // Anteprima immagine cover
+    document.getElementById('room-cover').addEventListener('change', function () {
+      const file = this.files[0];
+      const fileName = file ? file.name : 'Nessun file selezionato';
+      document.getElementById('room-cover-name').textContent = fileName;
+
+      const preview = document.getElementById('room-cover-preview');
+      if (file) {
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+          preview.src = e.target.result;
+          preview.style.display = 'block';
+        };
+
+        reader.readAsDataURL(file);
+      } else {
+        preview.src = '';
+        preview.style.display = 'none';
+      }
+    });
+  </script>
+</body>
+</html>
