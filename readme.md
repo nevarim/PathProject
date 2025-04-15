@@ -1,13 +1,112 @@
-Registrazione
 Metodo: POST
-URL: http://localhost:3000/user/register
+URL: http://loki:3000/register
 Headers:
-Content-Type: application/json
-Body:
+Content-Type: multipart/form-data
+
+
+Body: Imposta il corpo della richiesta come form-data con i seguenti campi:
+- username: Inserisci il nome utente desiderato (ad esempio, testuser).
+- password: Inserisci una password valida (ad esempio, password123).
+- avatar: Carica un file immagine (ad esempio, profile.jpg). Questo campo è opzionale.
+
+
+Esempio di Corpo della Richiesta
+Quando invii la richiesta tramite Postman con i dati necessari, il corpo potrebbe apparire così (formattato come form-data):
+| Key | Value | Type | 
+| username | testuser | Text | 
+| password | password123 | Text | 
+| avatar | profile.jpg | File | 
+
+
+
+Risposta Attesa
+Se la registrazione ha successo, la risposta sarà simile a questa:
 {
-"username": "nuovoUsername",
-"password": "nuovaPassword"
+    "message": "Utente registrato con successo!",
+    "user": {
+        "id": 1,
+        "username": "testuser",
+        "avatar": "http://loki:3000/images/avatars/resized-profile.jpg",
+        "createdAt": "2025-04-15T12:00:00.000Z",
+        "updatedAt": "2025-04-15T12:00:00.000Z",
+        "isTemporary": true
+    }
 }
+
+
+
+Possibili Errori
+- Se l'utente esiste già:{
+    "error": "L'utente esiste già. Scegli un nome utente diverso."
+}
+
+- Errore durante il caricamento dell'immagine:{
+    "error": "Formato immagine non valido. Usa PNG o JPEG."
+}
+
+- Errore generico del server:{
+    "error": "Errore durante la registrazione.",
+    "details": "Descrizione dell'errore specifico."
+}
+
+
+
+
+Metodo: GET
+URL: http://loki:3000/user/userInfo/nevarim
+Headers: Nessuno obbligatorio.
+
+Esempio di Risposta JSON
+{
+    "message": "Informazioni utente recuperate con successo.",
+    "user": {
+        "id": 1,
+        "username": "nevarim",
+        "displayName": "Nevarim",
+        "email": "nevarim@example.com",
+        "avatar": "http://loki:3000/images/avatars/2/avatar-resized.png",
+        "lastLogin": "2025-04-09T10:23:45Z",
+        "preferredLanguage": "en",
+        "chatColor": "#000000",
+        "friendsList": [
+            {
+                "id": 3,
+                "username": "friend1"
+            }
+        ],
+        "blockedUsers": [],
+        "biography": "Lorem ipsum dolor sit amet.",
+        "theme": "dark",
+        "xp": 1234,
+        "achievements": ["First Login", "Master Explorer"],
+        "twoFactorEnabled": true,
+        "ipLog": [
+            "192.168.0.1",
+            "192.168.1.5"
+        ],
+        "isBanned": false,
+        "createdAt": "2025-04-01T08:00:00Z",
+        "updatedAt": "2025-04-09T10:23:45Z"
+    }
+}
+
+
+
+Error Handling
+- Utente Non Trovato:{
+    "error": "Utente non trovato."
+}
+
+- Errore Interno al Server:{
+    "error": "Errore durante il recupero delle informazioni utente.",
+    "details": "Messaggio dell'errore specifico."
+}
+
+
+
+
+
+
 
 Login
 Metodo: POST
@@ -62,9 +161,9 @@ response
     }
 }
 
-Status dell Utente
+
 Metodo: PUT
-URL: http://localhost:3000/user/status/update-avatar
+URL: http://localhost:3000/user/update-avatar
 Headers:
 Authorization: Bearer ilTokenRicevutoDalLogin
 Body:
@@ -75,6 +174,88 @@ response
     "avatar": "http://localhost:3000/images/avatars/resized-123456789-avatar.png"
 }
 
+
+------------------------------
+
+Metodo: PUT
+URL: http://loki:3000/user/update-profile/:id
+Headers:
+Authorization: Bearer <token>
+Content-Type: application/json
+
+
+Body (JSON):
+{
+    "username": "nuovo_username",
+    "displayName": "Nuovo Nome",
+    "biography": "Questa è la mia biografia aggiornata",
+    "avatar": "avatars/1/new-avatar.png",
+    "preferredLanguage": "it",
+    "chatColor": "#FF5733",
+    "theme": "light"
+}
+
+
+
+Esempio di Risposta Attesa
+{
+    "message": "Profilo aggiornato con successo.",
+    "user": {
+        "id": 1,
+        "username": "nuovo_username",
+        "displayName": "Nuovo Nome",
+        "biography": "Questa è la mia biografia aggiornata",
+        "avatar": "http://loki:3000/images/avatars/1/new-avatar.png",
+        "preferredLanguage": "it",
+        "chatColor": "#FF5733",
+        "theme": "light",
+        "createdAt": "2025-04-15T12:00:00.000Z",
+        "updatedAt": "2025-04-15T12:00:00.000Z"
+    }
+}
+
+
+
+Note
+- Campi Protetti: Gli unici campi non modificabili sono email e id.
+- Autenticazione: Richiede un token JWT valido per garantire la sicurezza.
+- Campi Opzionali: Solo i campi forniti nel corpo della richiesta saranno aggiornati.
+
+
+-------------------------
+
+
+- Cancella Account
+Metodo: DELETE
+URL: http://loki:3000/user/delete
+Headers:
+Authorization: Bearer il-tuo-token
+
+
+- Recupera Lista di Amici
+Metodo: GET
+URL: http://loki:3000/user/friends
+Headers:
+Authorization: Bearer il-tuo-token
+
+
+- Aggiorna Tema Preferito
+Metodo: PUT
+URL: http://loki:3000/user/update-theme
+Headers:
+Content-Type: application/json
+Authorization: Bearer il-tuo-token
+Body:
+{
+"theme": "dark"
+}
+
+
+- Controllo dello Stato di Banned
+Metodo: GET
+URL: http://loki:3000/user/is-banned
+Headers:
+Author
 
 
 
@@ -139,50 +320,114 @@ Content-Type: application/json
 Body:
 Vuoto
 
-Richiesta GET per le stanze di cui l'utente è GM:
+
+Rotta GM
 Metodo: GET
-URL: http://localhost:3000/room/gm
+URL: http://loki:3000/room/gm
 Headers:
-Authorization: Bearer token
-response:
+Authorization: Bearer il-tuo-token
+Parametri: Nessuno nel corpo della richiesta. Il token di autenticazione è obbligatorio.
+
+Risposta:
+Esempio di risposta JSON:
 {
     "message": "Lista delle stanze di cui sei GM recuperata con successo.",
     "rooms": [
         {
             "id": 1,
-            "name": "Stanza 1",
-            "description": "Descrizione della stanza",
-            "resizedCover": "http://localhost:3000/images/covers/2/resized-1744038994875-test1.jpg",
-            "originalCover": "http://localhost:3000/images/covers/2/1744038994875-test1.jpg",
-            "createdAt": "2025-04-07T10:00:00.000Z",
-            "updatedAt": "2025-04-07T11:00:00.000Z"
+            "name": "Stanza GM",
+            "description": "Descrizione della stanza GM",
+            "cover": "images/covers/room1-cover.png",
+            "originalCover": "images/covers/room1-original.png",
+            "createdBy": 2,
+            "createdAt": "2025-04-09T12:00:00Z",
+            "updatedAt": "2025-04-09T12:00:00Z",
+            "resizedCover": "http://loki:3000/images/covers/room1-cover.png",
+            "originalCover": "http://loki:3000/images/covers/room1-original.png",
+            "participants": [
+                {
+                    "id": 3,
+                    "username": "player1",
+                    "role": "player"
+                },
+                {
+                    "id": 4,
+                    "username": "player2",
+                    "role": "gm"
+                }
+            ]
         }
     ]
 }
 
-Richiesta GET per le stanze di cui l'utente è Player:
+Rotta Player
 Metodo: GET
-URL: http://localhost:3000/room/player
+URL: http://loki:3000/room/player
 Headers:
-Authorization: Bearer token
-response:
+Authorization: Bearer il-tuo-token
+Parametri: Nessuno nel corpo della richiesta. Il token di autenticazione è obbligatorio.
+
+Risposta:
+Esempio di risposta JSON:
 {
     "message": "Lista delle stanze di cui sei Player recuperata con successo.",
     "rooms": [
         {
             "id": 2,
-            "name": "Stanza 2",
-            "description": "Descrizione della stanza",
-            "resizedCover": "http://localhost:3000/images/covers/3/resized-1744038994875-test2.jpg",
-            "originalCover": "http://localhost:3000/images/covers/3/1744038994875-test2.jpg",
-            "createdAt": "2025-04-07T10:10:00.000Z",
-            "updatedAt": "2025-04-07T11:10:00.000Z"
+            "name": "Stanza Player",
+            "description": "Descrizione della stanza Player",
+            "cover": "images/covers/room2-cover.png",
+            "originalCover": "images/covers/room2-original.png",
+            "createdAt": "2025-04-09T14:00:00Z",
+            "updatedAt": "2025-04-09T14:00:00Z",
+            "resizedCover": "http://loki:3000/images/covers/room2-cover.png",
+            "originalCover": "http://loki:3000/images/covers/room2-original.png",
+            "participants": [
+                {
+                    "id": 5,
+                    "username": "player3",
+                    "role": "player"
+                },
+                {
+                    "id": 6,
+                    "username": "player4",
+                    "role": "player"
+                }
+            ]
         }
     ]
 }
 
 
-Endpoint: PUT http://localhost:3000/:idroom/editRoom
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Endpoint: PUT http://localhost:3000/room/:idroom/editRoom
 Metodo: PUT
 Headers:
 Authorization: Bearer <your_token>
@@ -193,6 +438,47 @@ description  (facoltativo): Nuova descrizione della stanza.
 cover (facoltativo): Nuova immagine della cover.
 
 risposta: dettagli aggiornati della camera
+
+
+
+
+Metodo: GET
+URL: http://loki:3000/room/1/loadRoom
+Headers:
+Authorization: Bearer <token>
+
+
+
+Esempio di Risposta JSON
+{
+    "message": "Dati della stanza recuperati con successo.",
+    "room": {
+        "id": 1,
+        "name": "Stanza Test",
+        "description": "Questa è una stanza di esempio.",
+        "originalCover": "http://loki:3000/images/covers/1_room.jpg",
+        "resizedCover": "http://loki:3000/images/covers/1_room_resized.jpg",
+        "createdBy": 1,
+        "createdAt": "2025-04-15T10:00:00.000Z",
+        "updatedAt": "2025-04-15T11:00:00.000Z"
+    }
+}
+
+
+
+Gestione degli Errori
+- Stanza Non Trovata:{
+    "error": "Stanza non trovata."
+}
+
+- Accesso Negato:{
+    "error": "Accesso negato alla stanza."
+}
+
+- Errore Interno al Server:{
+    "error": "Errore durante il caricamento della stanza.",
+    "details": "Messaggio dell'errore specifico."
+}
 
 
 
@@ -226,3 +512,463 @@ userId: 2,
 message: Ciao, come va
 Risultato atteso:
 [id: 3, roomId: 1, userId: 2, message: Ciao, come va, createdAt: 2025-04-08T10:10:00.000Z]
+
+
+
+
+
+***************************************************
+
+
+token
+
+
+1. Caricamento del Token
+Metodo: POST
+URL: http://loki:3000/tokenimages/upload
+Headers:
+Authorization: Bearer <token>
+Content-Type: multipart/form-data
+
+
+Body (form-data): | Key         | Value               | Type  | |-------------|---------------------|-------| | name        | Nome del Token      | Text  | | tokenImage  | immagine.png/jpg    | File  |
+Risposta Attesa:
+{
+    "message": "Token caricato con successo!",
+    "token": {
+        "id": 1,
+        "url": "tokens/2/resized-immagine.png",
+        "name": "Nome-del-Token",
+        "createdAt": "2025-04-15T12:00:00.000Z",
+        "updatedAt": "2025-04-15T12:00:00.000Z",
+        "userId": 2
+    }
+}
+
+
+
+2. Ottenere la Lista dei Token dell'Utente
+Metodo: GET
+URL: http://loki:3000/tokenimages/user-tokens
+Headers:
+Authorization: Bearer <token>
+
+
+Risposta Attesa:
+[
+    {
+        "id": 1,
+        "url": "tokens/2/resized-immagine.png",
+        "name": "Nome-del-Token",
+        "createdAt": "2025-04-15T12:00:00.000Z",
+        "updatedAt": "2025-04-15T12:00:00.000Z",
+        "userId": 2
+    }
+]
+
+
+
+3. Ottenere Dettagli di un Token
+Metodo: GET
+URL: http://loki:3000/tokenimages/1
+Headers:
+Authorization: Bearer <token>
+
+
+Risposta Attesa:
+{
+    "id": 1,
+    "url": "tokens/2/resized-immagine.png",
+    "name": "Nome-del-Token",
+    "createdAt": "2025-04-15T12:00:00.000Z",
+    "updatedAt": "2025-04-15T12:00:00.000Z",
+    "userId": 2
+}
+
+
+
+4. Modificare un Token
+Metodo: PUT
+URL: http://loki:3000/tokenimages/1
+Headers:
+Authorization: Bearer <token>
+Content-Type: application/json
+
+
+Body (JSON):
+{
+    "name": "Nuovo-Nome-del-Token"
+}
+
+
+Risposta Attesa:
+{
+    "message": "Token aggiornato con successo.",
+    "token": {
+        "id": 1,
+        "url": "tokens/2/resized-immagine.png",
+        "name": "Nuovo-Nome-del-Token",
+        "createdAt": "2025-04-15T12:00:00.000Z",
+        "updatedAt": "2025-04-15T12:30:00.000Z",
+        "userId": 2
+    }
+}
+
+
+
+5. Cancellare un Token
+Metodo: DELETE
+URL: http://loki:3000/tokenimages/1
+Headers:
+Authorization: Bearer <token>
+
+
+Risposta Attesa:
+{
+    "message": "Token eliminato con successo."
+}
+
+
+
+6. Contare i Token dell'Utente
+Metodo: GET
+URL: http://loki:3000/tokenimages/count
+Headers:
+Authorization: Bearer <token>
+
+
+Risposta Attesa:
+{
+    "count": 1
+}
+
+
+
+
+Metodo: POST
+URL: http://loki:3000/tokenimages/upload-multiple
+
+Headers:
+Authorization: Bearer <token>
+Content-Type: multipart/form-data
+
+
+
+Body (form-data): | Key       | Value             | Type | |----------------|-----------------------|----------| | tokenImages    | immagine1.png/jpg     | File     | | tokenImages    | immagine2.png/jpg     | File     | | tokenImages    | immagine3.png/jpg     | File     |
+
+Risultato Atteso
+Se il caricamento ha successo, la risposta sarà simile a questa:
+{
+    "message": "Token multipli caricati con successo!",
+    "tokens": [
+        {
+            "id": 1,
+            "url": "http://loki:3000/images/tokens/2/1678900000-immagine1.png",
+            "name": "Temporary-1678900000",
+            "createdAt": "2025-04-15T12:00:00.000Z",
+            "updatedAt": "2025-04-15T12:00:00.000Z",
+            "userId": 2
+        },
+        {
+            "id": 2,
+            "url": "http://loki:3000/images/tokens/2/1678900100-immagine2.jpg",
+            "name": "Temporary-1678900100",
+            "createdAt": "2025-04-15T12:01:00.000Z",
+            "updatedAt": "2025-04-15T12:01:00.000Z",
+            "userId": 2
+        },
+        {
+            "id": 3,
+            "url": "http://loki:3000/images/tokens/2/1678900200-immagine3.png",
+            "name": "Temporary-1678900200",
+            "createdAt": "2025-04-15T12:02:00.000Z",
+            "updatedAt": "2025-04-15T12:02:00.000Z",
+            "userId": 2
+        }
+    ]
+}
+
+
+
+Punti Importanti
+- Numero di File: Puoi caricare fino a 10 file contemporaneamente.
+- Header Authorization: Il token è essenziale per autenticare la richiesta.
+- Nome Temporaneo: I token ricevono un nome temporaneo (es. Temporary-<timestamp>).
+
+
+------------------------------------------
+
+
+1. Aggiungi un Token a una Mappa
+Metodo: POST
+URL: http://<tuo_server>/api/map-tokens/:mapId/add-token
+Headers:
+Authorization: Bearer <token>
+Content-Type: application/json
+
+
+Body (JSON):
+{
+    "tokenId": 1,
+    "x": 3,
+    "y": 5,
+    "width": 1,
+    "height": 1,
+    "isVisible": true
+}
+
+
+Risultato Atteso:
+- Token aggiunto alla mappa con successo.
+- Il server risponde con i dettagli del token aggiunto.
+
+
+2. Recupera i Token di una Mappa
+Metodo: GET
+URL: http://<tuo_server>/api/map-tokens/:mapId/tokens
+Headers:
+Authorization: Bearer <token>
+
+
+Risultato Atteso:
+- Elenco di tutti i token associati alla mappa specificata.
+- La risposta include informazioni come id, url, name, e posizione.
+
+
+3. Sposta un Token sulla Griglia
+Metodo: PUT
+URL: http://<tuo_server>/api/map-tokens/:mapId/token/:mapTokenId/move
+Headers:
+Authorization: Bearer <token>
+Content-Type: application/json
+
+
+Body (JSON):
+{
+    "x": 7,
+    "y": 9
+}
+
+
+Risultato Atteso:
+- Token spostato con successo.
+- La risposta include le nuove coordinate del token.
+
+
+Test su Postman
+- Aggiunta di Token:- Seleziona POST e inserisci l'URL.
+- Inserisci mapId nell'URL e compila il Body.
+- Verifica che il token venga aggiunto correttamente.
+
+- Recupero dei Token:- Seleziona GET, sostituisci mapId nell'URL.
+- Conferma che i token associati alla mappa vengano restituiti.
+
+- Movimento Token:- Seleziona PUT, sostituisci mapId e mapTokenId nell'URL.
+- Compila il Body con le nuove coordinate.
+
+
+
+
+1. Caricamento di una Mappa
+Metodo: POST
+URL: http://<tuo_server>/map/upload
+Headers:
+Authorization: Bearer <token>
+Content-Type: multipart/form-data
+
+
+Body (form-data):
+- map: [file] (scegli un file da caricare)
+- name: Nome della mappa (es. "Dungeon 1")
+- description: Descrizione della mappa (es. "Mappa del dungeon sotterraneo")
+- roomId: ID della stanza (es. 1)
+- mapSize: Dimensioni della mappa (es. "1000x800")
+- gridSize: Dimensioni della griglia (es. "50x50")
+
+Risultato Atteso:
+- Risposta di successo con dettagli della mappa caricata:{
+    "message": "Mappa caricata e registrata con successo!",
+    "map": {
+        "id": 1,
+        "name": "Dungeon 1",
+        "description": "Mappa del dungeon sotterraneo",
+        "roomId": 1,
+        "mapSize": "1000x800",
+        "gridSize": "50x50",
+        "filePath": "uploads/filename.png"
+    }
+}
+
+
+
+2. Recupero delle Mappe per una Stanza
+Metodo: GET
+URL: http://<tuo_server>/map/list/:roomId
+Headers:
+Authorization: Bearer <token>
+
+
+Risultato Atteso:
+- Lista delle mappe associate alla stanza specificata:{
+    "message": "Elenco delle mappe recuperato con successo!",
+    "maps": [
+        {
+            "id": 1,
+            "name": "Dungeon 1",
+            "description": "Mappa del dungeon sotterraneo",
+            "roomId": 1,
+            "mapSize": "1000x800",
+            "gridSize": "50x50",
+            "filePath": "uploads/filename.png"
+        }
+    ]
+}
+
+
+
+3. Eliminazione di una Mappa
+Metodo: DELETE
+URL: http://<tuo_server>/map/:mapName
+Headers:
+Authorization: Bearer <token>
+
+
+Risultato Atteso:
+- Risposta di successo se la mappa è eliminata:{
+    "message": "Mappa eliminata con successo!"
+}
+
+
+
+4. Annotazioni sulla Mappa
+Metodo: POST
+URL: http://<tuo_server>/map/annotate
+Headers:
+Authorization: Bearer <token>
+Content-Type: application/json
+
+
+Body (JSON):
+{
+    "mapName": "Dungeon 1",
+    "annotations": [
+        { "x": 1, "y": 1, "note": "Ingresso" },
+        { "x": 5, "y": 3, "note": "Tesoro nascosto" }
+    ]
+}
+
+
+Risultato Atteso:
+- Risposta di successo con il percorso delle annotazioni salvate:{
+    "message": "Annotazioni salvate con successo!",
+    "annotationPath": "uploads/Dungeon 1.json"
+}
+
+
+
+5. Recupero delle Annotazioni
+Metodo: GET
+URL: http://<tuo_server>/map/annotations/:mapName
+Headers:
+Authorization: Bearer <token>
+
+
+Risultato Atteso:
+- Lista delle annotazioni associate alla mappa:{
+    "annotations": [
+        { "x": 1, "y": 1, "note": "Ingresso" },
+        { "x": 5, "y": 3, "note": "Tesoro nascosto" }
+    ]
+}
+
+
+
+6. Salvataggio del Fog of War
+Metodo: POST
+URL: http://<tuo_server>/map/fog
+Headers:
+Authorization: Bearer <token>
+Content-Type: application/json
+
+
+Body (JSON):
+{
+    "mapName": "Dungeon 1",
+    "hiddenAreas": [
+        { "x": 2, "y": 2 },
+        { "x": 3, "y": 4 }
+    ]
+}
+
+
+Risultato Atteso:
+- Risposta di successo con il percorso del Fog of War salvato:{
+    "message": "Fog of War salvato con successo!",
+    "fogPath": "uploads/Dungeon 1-fog.json"
+}
+
+
+
+7. Recupero del Fog of War
+Metodo: GET
+URL: http://<tuo_server>/map/fog/:mapName
+Headers:
+Authorization: Bearer <token>
+
+
+Risultato Atteso:
+- Dettagli delle aree nascoste:{
+    "fog": {
+        "hiddenAreas": [
+            { "x": 2, "y": 2 },
+            { "x": 3, "y": 4 }
+        ]
+    }
+}
+
+
+
+8. Salvataggio dei Token sulla Mappa
+Metodo: POST
+URL: http://<tuo_server>/map/token
+Headers:
+Authorization: Bearer <token>
+Content-Type: application/json
+
+
+Body (JSON):
+{
+    "mapName": "Dungeon 1",
+    "tokens": [
+        { "id": 1, "x": 2, "y": 3, "width": 1, "height": 1, "isVisible": true },
+        { "id": 2, "x": 4, "y": 6, "width": 2, "height": 2, "isVisible": false }
+    ]
+}
+
+
+Risultato Atteso:
+- Risposta di successo con il percorso dei token salvati:{
+    "message": "Tokens salvati con successo!",
+    "tokenPath": "uploads/Dungeon 1-tokens.json"
+}
+
+
+
+9. Recupero dei Token sulla Mappa
+Metodo: GET
+URL: http://<tuo_server>/map/token/:mapName
+Headers:
+Authorization: Bearer <token>
+
+
+Risultato Atteso:
+- Lista dei token salvati per la mappa:{
+    "tokens": [
+        { "id": 1, "x": 2, "y": 3, "width": 1, "height": 1, "isVisible": true },
+        { "id": 2, "x": 4, "y": 6, "width": 2, "height": 2, "isVisible": false }
+    ]
+}
+
+
+
+

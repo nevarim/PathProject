@@ -23,7 +23,7 @@ console.log(`Frontend configurato su: ${frontUrl}`);
 // Configura CORS globalmente per Express
 app.use(cors({
     origin: `http://${hostIp}:${frontPort}`, // Permetti richieste dal frontend
-    methods: ['GET', 'POST'], // Metodi permessi
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Metodi permessi
     allowedHeaders: ['Content-Type', 'Authorization'], // Intestazioni consentite
     credentials: true, // Permetti invio di cookie e credenziali
 }));
@@ -42,20 +42,23 @@ app.use('/images', express.static(path.join(__dirname, '..', 'images')));
 app.get('/', (req, res) => {
     res.send('Backend funzionante!');
 });
-
 // Importa le rotte
 const diceRoutes = require('./routes/diceRoutes');
 const userRoutes = require('./routes/userRoutes');
 const roomRoutes = require('./routes/roomRoutes');
 const mapRoutes = require('./routes/mapRoutes');
 const chatRoutes = require('./routes/chatRoutes');
+const tokenImagesRoutes = require('./routes/tokenimagesRoutes');
+const mapTokenRoutes = require('./routes/mapTokenRoutes'); // Aggiungi questa riga
 
 // Monta le rotte
 app.use('/chat', chatRoutes);
 app.use('/dice', diceRoutes);
 app.use('/user', userRoutes);
 app.use('/room', roomRoutes);
+app.use('/tokenimages', tokenImagesRoutes);
 app.use(mapRoutes);
+app.use('/map-tokens', mapTokenRoutes); // Aggiungi questa riga
 
 // Sincronizzazione del database
 sequelize.sync({ force: false })

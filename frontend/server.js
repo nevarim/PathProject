@@ -1,49 +1,45 @@
 const express = require('express');
 const path = require('path');
-require('dotenv').config(); // Carica le variabili d'ambiente dal file .env
+
+require('dotenv').config(); // Load environment variables from .env file
 
 const app = express();
 
-// Middleware per servire file statici (CSS, JS, immagini)
+// Middleware to serve static files (CSS, JS, images)
 app.use('/css', express.static(path.join(__dirname, 'public/css')));
 app.use('/js', express.static(path.join(__dirname, 'public/js')));
-app.use('/images', express.static(path.join(__dirname, 'public/images'))); // Sezione immagini statica
+app.use('/images', express.static(path.join(__dirname, 'public/images'))); // Static image section
 
-// Configurazione EJS
+// Configure EJS
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// Rotta per la pagina Game Room
+// Route for Game Room Page
 app.get('/game', (req, res) => {
-    const roomId = req.query.roomid; // Recupera roomid dalla query string
-    const userId = req.query.userid; // Recupera userid dalla query string
-
-    if (!roomId || !userId) {
-        console.error('⚠ Parametri mancanti: roomid o userid.');
-        return res.status(400).send('Errore: mancano roomid o userid.');
-    }
-
+    const roomId = req.query.roomid; // Extract room ID from query parameters
+    const userId = req.query.userid; // Extract user ID from query parameters
     res.render('game', {
-        title: `Game Room - Room ${roomId}`, // Passa un titolo dinamico
-        roomId, // Passa l'ID stanza al template
-        userId, // Passa l'ID utente al template
+        HOSTIP: process.env.HOSTIP,      // Extracted from .env
+        HOSTPORT: process.env.HOSTPORT, // Extracted from .env
+        roomId: roomId,                 // Passed from the query parameters
+        userId: userId,                 // Passed from the query parameters
     });
 });
 
-// Rotta per la homepage
+// Route for Homepage
 app.get('/', (req, res) => {
     res.render('index', {
-        user: null, // Passa informazioni utente, se disponibili
-        backendURL: process.env.BACKEND_URL || 'http://localhost:3000', // URL dinamica per il backend
-        projectName: process.env.REACT_APP_PROJECT_NAME || 'Default Project', // Nome progetto dinamico
+        user: null, // Optional user information
+        BACKEND_URL: `http://${process.env.HOSTIP}:${process.env.HOSTPORT}`, // Dynamic backend URL
+        projectName: process.env.REACT_APP_PROJECT_NAME || 'Default Project', // Dynamic project name
     });
 });
 
-// Avvia il server
+// Start the Server
 const PORT = process.env.PORT || 3001;
 const HOSTIP = process.env.HOSTIP || 'localhost';
 const HOSTPORT = process.env.HOSTPORT || 3000;
 
 app.listen(PORT, () => {
-    console.log(`✨ Server in esecuzione su http://${HOSTIP}:${PORT}`);
+    console.log(`✨ Server running at http://${HOSTIP}:${PORT}`);
 });

@@ -1,0 +1,59 @@
+<script src="/js/gameChat.js" defer></script>
+<link rel="stylesheet" href="/css/gameChat.css">
+<div id="chat-container">
+    <div id="chat-tab">
+        <h2>Chat</h2>
+
+        <!-- Messaggi della chat -->
+        <div id="chat-messages"></div>
+
+        <!-- Form della chat -->
+        <form id="chat-form">
+            <div id="emoji-container">
+                <!-- Pulsante per aprire il selettore emoji -->
+                <button type="button" id="emoji-button" aria-label="Seleziona un'emoji">😊</button>
+
+                <!-- Selettore emoji con tab -->
+                <div id="emoji-selector" style="display: none;">
+                    <div id="emoji-tabs">
+                        <button type="button" class="emoji-tab active" data-tab="faces">😀</button>
+                        <button type="button" class="emoji-tab" data-tab="animals">🐱</button>
+                        <button type="button" class="emoji-tab" data-tab="objects">⚽</button>
+                    </div>
+                    <div id="emoji-content">
+                        <!-- Tab: Faccine -->
+                        <div class="emoji-tab-content" data-tab="faces">
+                            <button type="button">😀</button>
+                            <button type="button">😂</button>
+                            <button type="button">😎</button>
+                            <button type="button">😊</button>
+                            <button type="button">😍</button>
+                        </div>
+                        <!-- Tab: Animali -->
+                        <div class="emoji-tab-content" data-tab="animals" style="display: none;">
+                            <button type="button">🐶</button>
+                            <button type="button">🐱</button>
+                            <button type="button">🐭</button>
+                            <button type="button">🦊</button>
+                            <button type="button">🐻</button>
+                        </div>
+                        <!-- Tab: Oggetti -->
+                        <div class="emoji-tab-content" data-tab="objects" style="display: none;">
+                            <button type="button">⚽</button>
+                            <button type="button">🏀</button>
+                            <button type="button">🎸</button>
+                            <button type="button">🎮</button>
+                            <button type="button">🎲</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Campo input messaggi -->
+            <input type="text" id="chat-input" placeholder="Scrivi un messaggio..." required />
+
+            <!-- Pulsante di invio -->
+            <button type="submit">Invia</button>
+        </form>
+    </div>
+</div>

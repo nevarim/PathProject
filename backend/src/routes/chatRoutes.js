@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const Chatlogs = require('../models/Chatlogs');
+const User = require('../models/User'); // Importa il modello User
+const Room = require('../models/Room'); // Importa il modello Room
+
 
 // Recupera tutti i messaggi di una stanza
 router.get('/:roomId', async (req, res) => {
@@ -18,6 +21,7 @@ router.get('/:roomId', async (req, res) => {
     }
 });
 
+
 // Crea un nuovo messaggio di chat
 router.post('/', async (req, res) => {
     const { roomId, userId, message } = req.body;
@@ -27,6 +31,19 @@ router.post('/', async (req, res) => {
     }
 
     try {
+        // Verifica se la stanza esiste
+        const roomExists = await Room.findByPk(roomId);
+        if (!roomExists) {
+            return res.status(400).json({ error: 'La stanza specificata non esiste.' });
+        }
+
+        // Verifica se l'utente esiste
+        const userExists = await User.findByPk(userId);
+        if (!userExists) {
+            return res.status(400).json({ error: 'L\'utente specificato non esiste.' });
+        }
+
+        // Crea il nuovo messaggio
         const newMessage = await Chatlogs.create({ roomId, userId, message });
         res.status(201).json(newMessage);
     } catch (error) {
@@ -36,3 +53,11 @@ router.post('/', async (req, res) => {
 });
 
 module.exports = router;
+
+
+
+
+
+
+
+

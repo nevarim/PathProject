@@ -1,145 +1,25 @@
-/* Stile generale */
-body {
-    margin: 0;
-    padding: 0;
-    font-family: Arial, sans-serif;
-    background-color: #2e2e2e;
-    color: #ffffff;
-    height: 100vh;
-    display: flex;
+/* Layout principale */
+#game-layout {
+    display: flex; /* Utilizza Flexbox per suddividere lo spazio */
+    height: 100vh; /* Altezza del viewport */
+    width: 100vw; /* Larghezza del viewport */
 }
 
-#game-container {
-    display: flex;
-    width: 100%;
-    height: 100%;
-    overflow: hidden; /* Previene il collasso quando compaiono le scrollbar */
-}
-
-/* Sezione Mappa */
-#map-section {
-    flex: 7; /* Larghezza iniziale */
-    min-width: 300px; /* Imposta una larghezza minima */
-    background-color: #1e1e1e;
+/* Area della mappa */
+#map-area {
+    flex: 7; /* 70% dello spazio */
+    background-color: #333; /* Grigio scuro */
     display: flex;
     justify-content: center;
     align-items: center;
-    overflow: hidden; /* Evita scrollbox orizzontali che influenzano il layout */
+    overflow: hidden; /* Nasconde elementi fuori dal contenitore */
 }
 
-#game-map {
-    width: 100%;
-    height: 100%;
-    background-color: #fff;
-    border: 2px solid #444;
-    border-radius: 10px;
-}
-
-/* Divisore per il ridimensionamento */
-#resizer {
-    width: 5px;
-    cursor: col-resize;
-    background-color: #ff6347; /* Cambia colore del resizer a rosso acceso */
-    position: relative;
-    z-index: 10; /* Assicurati che sia sempre sopra altri elementi */
-    min-height: 100%; /* Mantieni l'altezza del contenitore */
-}
-
-#resizer:hover {
-    background-color: #ffa07a; /* Colore più chiaro al passaggio del mouse */
-}
-
-/* Sezione Pannelli */
-#panel-section {
-    flex: 3; /* Larghezza iniziale */
-    min-width: 200px; /* Imposta una larghezza minima */
-    background-color: #3b3b3b;
-    display: flex;
-    flex-direction: column;
-    overflow-y: auto; /* Permette lo scrolling verticale */
-}
-
-#tabs {
-    display: flex;
-    background-color: #444;
-    border-bottom: 2px solid #333;
-}
-
-.tab {
-    flex: 1;
-    padding: 10px;
-    text-align: center;
-    cursor: pointer;
-    background-color: #444;
-    border: none;
-    color: #fff;
-    border-right: 1px solid #333;
-    transition: background-color 0.3s;
-}
-
-.tab:last-child {
-    border-right: none;
-}
-
-.tab:hover, .tab.active {
-    background-color: #555;
-}
-
-/* Contenuto delle Tab */
-#tab-content {
-    flex: 1; /* Assicura che il contenuto delle tab occupi l'altezza disponibile */
-    overflow: hidden; /* Evita overflow indesiderati */
-    display: flex;
-    flex-direction: column; /* Organizza il contenuto verticalmente */
-    padding: 10px;
-}
-
-.tab-pane {
-    display: none;
-}
-
-.tab-pane.active {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-}
-
-/* Chat Pane */
-#chat {
-    flex: 1; /* Permette alla chat di occupare tutta l'altezza disponibile */
-    display: flex;
-    flex-direction: column; /* Organizza gli elementi della chat verticalmente */
-}
-
-#chat-messages {
-    flex: 1; /* L'area dei messaggi occupa tutto lo spazio disponibile */
-    overflow-y: auto; /* Aggiunge lo scrolling verticale per i messaggi */
-    background-color: #1e1e1e;
-    padding: 10px;
-    border-radius: 5px;
-    margin-bottom: 10px;
-}
-
-#chat-form {
-    display: flex;
-}
-
-#chat-input {
-    flex: 1; /* L'input occupa la maggior parte della larghezza */
-    padding: 10px;
-    border: none;
-    border-radius: 5px 0 0 5px;
-}
-
-#chat-form button {
-    padding: 10px 15px;
-    border: none;
-    background-color: #0069d9;
-    color: #fff;
-    border-radius: 0 5px 5px 0;
-    cursor: pointer;
-}
-
-#chat-form button:hover {
-    background-color: #0056b3;
+/* Area dei tabs */
+#tabs-area {
+    flex: 3; /* 30% dello spazio */
+    background-color: #222; /* Grigio ancora più scuro */
+    color: #fff; /* Testo bianco */
+    overflow-y: auto; /* Abilita lo scorrimento verticale */
+    border-left: 2px solid #4caf50; /* Bordo visivo tra mappa e tabs */
 }

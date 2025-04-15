@@ -152,6 +152,62 @@ router.post('/logout', authenticate, async (req, res) => {
     }
 });
 
+
+router.get('/userInfo/:username', async (req, res) => {
+    try {
+        const { username } = req.params;
+
+        // Trova l'utente nel database
+        const user = await User.findOne({ 
+            where: { username }, 
+            attributes: { 
+                exclude: ['password'] // Escludi il campo "password"
+            }
+        });
+
+        if (!user) {
+            return res.status(404).json({ error: 'Utente non trovato.' });
+        }
+
+        // Costruisci la risposta con l'avatar completo
+        const avatarUrl = user.avatar 
+            ? `${BASE_URL}${user.avatar}` 
+            : `${BASE_URL}avatars/default-avatar.png`;
+
+        res.status(200).json({
+            message: 'Informazioni utente recuperate con successo.',
+            user: {
+                id: user.id,
+                username: user.username,
+                displayName: user.displayName,
+                email: user.email,
+                avatar: avatarUrl,
+                lastLogin: user.lastLogin,
+                preferredLanguage: user.preferredLanguage,
+                chatColor: user.chatColor,
+                friendsList: user.friendsList || [],
+                blockedUsers: user.blockedUsers || [],
+                biography: user.biography,
+                theme: user.theme,
+                xp: user.xp,
+                achievements: user.achievements || [],
+                twoFactorEnabled: user.twoFactorEnabled,
+                ipLog: user.ipLog || [],
+                isBanned: user.isBanned,
+                createdAt: user.createdAt,
+                updatedAt: user.updatedAt
+            }
+        });
+    } catch (err) {
+        console.error('Errore durante il recupero delle informazioni utente:', err);
+        res.status(500).json({ 
+            error: 'Errore durante il recupero delle informazioni utente.', 
+            details: err.message 
+        });
+    }
+});
+
+
 // **Rotta per ottenere lo stato dell'utente tramite username**
 router.get('/status/:username', async (req, res) => {
     try {
@@ -167,12 +223,13 @@ router.get('/status/:username', async (req, res) => {
             user: {
                 id: user.id,
                 username: user.username,
-                avatar: user.avatar ? `${BASE_URL}/images/${user.avatar}` : null,
+                avatar: user.avatar ? `${BASE_URL}${user.avatar}` : null, // Concatenazione corretta
                 isTemporary: user.isTemporary,
                 createdAt: user.createdAt,
                 updatedAt: user.updatedAt,
             },
         });
+        
     } catch (err) {
         console.error('Errore stato utente:', err);
         res.status(500).json({
@@ -254,5 +311,145 @@ router.post('/get-token', async (req, res) => {
         res.status(500).json({ error: 'Errore durante la generazione del token.', details: err.message });
     }
 });
+
+// **Rotta per aggiornare il profilo dell'utente**
+router.put('/update-profile/:id', authenticate, async (req, res) => {
+    try {
+        const { id } = req.params; // Recupera l'id dai parametri della richiesta
+        const {
+            username,
+            displayName,
+            biography,
+            avatar,
+            preferredLanguage,
+            chatColor,
+            theme
+        } = req.body; // Parametri che possono essere aggiornati
+
+        const user = await User.findByPk(id); // Recupera l'utente in base all'id
+        if (!user) {
+            return res.status(404).json({ error: 'Utente non trovato.' });
+        }
+
+        // Aggiorna i dettagli (tranne email e id)
+        if (username) user.username = username;
+        if (displayName) user.displayName = displayName;
+        if (biography) user.biography = biography;
+        if (avatar) user.avatar = avatar;
+        if (preferredLanguage) user.preferredLanguage = preferredLanguage;
+        if (chatColor) user.chatColor = chatColor;
+        if (theme) user.theme = theme;
+
+        await user.save();
+
+        res.status(200).json({
+            message: 'Profilo aggiornato con successo.',
+            user: {
+                id: user.id,
+                username: user.username,
+                displayName: user.displayName,
+                biography: user.biography,
+                avatar: user.avatar ? `${BASE_URL}${user.avatar}` : null,
+                preferredLanguage: user.preferredLanguage,
+                chatColor: user.chatColor,
+                theme: user.theme,
+                createdAt: user.createdAt,
+                updatedAt: user.updatedAt
+            },
+        });
+    } catch (err) {
+        console.error('Errore aggiornamento profilo:', err);
+        res.status(500).json({
+            error: 'Errore durante l\'aggiornamento del profilo.',
+            details: err.message,
+        });
+    }
+});
+
+// **Rotta per cancellare l'account dell'utente**
+router.delete('/delete', authenticate, async (req, res) => {
+    try {
+        const user = await User.findByPk(req.user.id);
+        if (!user) {
+            return res.status(404).json({ error: 'Utente non trovato.' });
+        }
+
+        await user.destroy();
+
+        res.status(200).json({ message: 'Account eliminato con successo.' });
+    } catch (err) {
+        console.error('Errore eliminazione account:', err);
+        res.status(500).json({ error: 'Errore durante l\'eliminazione dell\'account.', details: err.message });
+    }
+});
+
+// **Rotta per ottenere la lista amici**
+router.get('/friends', authenticate, async (req, res) => {
+    try {
+        const user = await User.findByPk(req.user.id);
+        if (!user) {
+            return res.status(404).json({ error: 'Utente non trovato.' });
+        }
+
+        res.status(200).json({ 
+            message: 'Lista amici recuperata con successo.',
+            friendsList: user.friendsList || [], 
+        });
+    } catch (err) {
+        console.error('Errore recupero lista amici:', err);
+        res.status(500).json({ error: 'Errore durante il recupero della lista amici.', details: err.message });
+    }
+});
+
+// **Rotta per aggiornare il tema preferito**
+router.put('/update-theme', authenticate, async (req, res) => {
+    try {
+        const { theme } = req.body;
+
+        if (!['dark', 'light'].includes(theme)) {
+            return res.status(400).json({ error: 'Tema non valido. Usa "dark" o "light".' });
+        }
+
+        const user = await User.findByPk(req.user.id);
+        if (!user) {
+            return res.status(404).json({ error: 'Utente non trovato.' });
+        }
+
+        user.theme = theme;
+        await user.save();
+
+        res.status(200).json({
+            message: 'Tema aggiornato con successo.',
+            theme: user.theme,
+        });
+    } catch (err) {
+        console.error('Errore aggiornamento tema:', err);
+        res.status(500).json({ error: 'Errore durante l\'aggiornamento del tema.', details: err.message });
+    }
+});
+
+// **Rotta per controllare se l'utente è bannato**
+router.get('/is-banned', authenticate, async (req, res) => {
+    try {
+        const user = await User.findByPk(req.user.id);
+        if (!user) {
+            return res.status(404).json({ error: 'Utente non trovato.' });
+        }
+
+        res.status(200).json({
+            isBanned: user.isBanned,
+            message: user.isBanned 
+                ? 'L\'utente è bannato.' 
+                : 'L\'utente non è bannato.',
+        });
+    } catch (err) {
+        console.error('Errore controllo stato bannato:', err);
+        res.status(500).json({ error: 'Errore durante il controllo dello stato bannato.', details: err.message });
+    }
+});
+
+
+
+
 
 module.exports = router;

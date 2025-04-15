@@ -15,29 +15,27 @@ router.post('/map/upload', authenticate, upload.single('map'), async (req, res) 
             return res.status(400).json({ error: 'Nessun file caricato.' });
         }
 
-        const { name, description } = req.body;
-        if (!name || !description) {
-            return res.status(400).json({ error: 'Il nome e la descrizione della mappa sono obbligatori.' });
+        const { name, description, roomId, mapSize, gridSize } = req.body;
+        if (!name || !description || !roomId) {
+            return res.status(400).json({ error: 'Il nome, la descrizione e il roomId della mappa sono obbligatori.' });
         }
 
         const userId = req.user.id;
         const filePath = `uploads/${req.file.filename}`;
-        
-        // Log dei dati da salvare
-        console.log('Dati da salvare nel database:', { userId, filePath, name, description });
 
-        // Salvataggio nel database
         const newMap = await Map.create({
             userId,
+            roomId,
             filePath,
             name,
             description,
             isVisibleToPlayers: true,
+            mapSize,
+            gridSize,
         });
 
         res.status(200).json({
             message: 'Mappa caricata e registrata con successo!',
-            filePath,
             map: newMap,
         });
     } catch (err) {
@@ -48,19 +46,18 @@ router.post('/map/upload', authenticate, upload.single('map'), async (req, res) 
 
 
 // **Lista delle mappe caricate dall'utente**
-router.get('/map/list', authenticate, async (req, res) => {
+router.get('/map/list/:roomId', authenticate, async (req, res) => {
     try {
-        const userId = req.user.id; // Recupera l'ID dell'utente autenticato
+        const userId = req.user.id;
+        const roomId = req.params.roomId; // ID della stanza
 
-        // Recupera le mappe dal database associate all'utente
         const maps = await Map.findAll({
-            where: { userId },
-            attributes: ['id', 'filePath', 'name', 'description', 'isVisibleToPlayers', 'createdAt', 'updatedAt'], // Campi da includere nella risposta
+            where: { userId, roomId },
+            attributes: ['id', 'filePath', 'name', 'description', 'mapSize', 'gridSize', 'isVisibleToPlayers', 'createdAt', 'updatedAt'],
         });
 
-        // Controlla se l'utente non ha mappe
         if (maps.length === 0) {
-            return res.status(404).json({ message: 'Nessuna mappa trovata per questo utente.' });
+            return res.status(404).json({ message: 'Nessuna mappa trovata per questa stanza.' });
         }
 
         res.status(200).json({
@@ -72,6 +69,7 @@ router.get('/map/list', authenticate, async (req, res) => {
         res.status(500).json({ error: 'Errore durante il recupero delle mappe.', details: err.message });
     }
 });
+
 // **3. Cancellazione di una mappa**
 router.delete('/map/:mapName', authenticate, async (req, res) => {
     try {

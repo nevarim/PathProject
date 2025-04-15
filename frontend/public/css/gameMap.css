@@ -1,0 +1,61 @@
+#map-settings {
+    background-color: #222; /* Grigio scuro */
+    color: #fff; /* Testo bianco */
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    width: 300px; /* Pannello compatto */
+}
+
+#map-settings h3 {
+    margin-top: 0;
+    text-align: center;
+    font-size: 1.5em;
+    color: #4caf50; /* Verde */
+}
+
+#map-settings label {
+    display: block;
+    margin-top: 10px;
+    font-size: 1em;
+}
+
+#map-settings input {
+    width: 100%;
+    padding: 8px;
+    background-color: #444;
+    border: none;
+    color: #fff;
+    border-radius: 5px;
+}
+
+#apply-config-btn {
+    width: 100%;
+    padding: 10px;
+    margin-top: 15px;
+    background-color: #4caf50;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+#apply-config-btn:hover {
+    background-color: #81c784;
+}
+
+#map-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #333; /* Grigio scuro */
+}
+
+#map-canvas {
+    width: 90%;
+    height: 90%;
+    background-color: #222; /* Grigio scuro per il canvas */
+    border: 1px solid #4caf50; /* Bordo verde */
+}

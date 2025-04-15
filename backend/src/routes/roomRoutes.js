@@ -7,7 +7,12 @@ const fs = require('fs'); // Per gestire il filesystem
 const { authenticate } = require('../middlewares/auth');
 const Room = require('../models/Room');
 const RoomUser = require('../models/RoomUser');
+const User = require('../models/User');
 
+Room.hasMany(RoomUser, { foreignKey: 'roomId' });
+RoomUser.belongsTo(Room, { foreignKey: 'roomId' });
+User.hasMany(RoomUser, { foreignKey: 'userId' });
+RoomUser.belongsTo(User, { foreignKey: 'userId' });
 
 require('dotenv').config(); // Assicurati di caricare le variabili d'ambiente
 
@@ -179,20 +184,38 @@ router.get('/gm', authenticate, async (req, res) => {
     try {
         const gmRooms = await Room.findAll({
             where: { createdBy: req.user.id },
-            attributes: ['id', 'name', 'description', 'cover', 'originalCover', 'createdBy', 'createdAt', 'updatedAt'], // Include `createdBy` nei dettagli
+            attributes: ['id', 'name', 'description', 'cover', 'originalCover', 'createdBy', 'createdAt', 'updatedAt'],
         });
 
-        // Aggiungi link completo alle cover
-        const gmRoomsWithLinks = gmRooms.map(room => ({
-            ...room.toJSON(),
-            resizedCover: room.cover ? `${BASE_URL}${room.cover}` : null, // URL ridimensionato
-            originalCover: room.originalCover ? `${BASE_URL}${room.originalCover}` : null, // URL originale
-            createdBy: room.createdBy, // Assicurati che il campo `createdBy` sia incluso
-        }));
+        const gmRoomsWithDetails = await Promise.all(
+            gmRooms.map(async (room) => {
+                const participants = await RoomUser.findAll({
+                    where: { roomId: room.id },
+                    include: {
+                        model: User,
+                        attributes: ['id', 'username'],
+                    },
+                    attributes: ['role'],
+                });
+
+                const formattedParticipants = participants.map((participant) => ({
+                    id: participant.User.id,
+                    username: participant.User.username,
+                    role: participant.role,
+                }));
+
+                return {
+                    ...room.toJSON(),
+                    resizedCover: room.cover ? `${BASE_URL}${room.cover}` : null,
+                    originalCover: room.originalCover ? `${BASE_URL}${room.originalCover}` : null,
+                    participants: formattedParticipants,
+                };
+            })
+        );
 
         res.status(200).json({
             message: 'Lista delle stanze di cui sei GM recuperata con successo.',
-            rooms: gmRoomsWithLinks, // Includi anche il valore `createdBy`
+            rooms: gmRoomsWithDetails,
         });
     } catch (err) {
         console.error('Errore durante il recupero delle stanze GM:', err);
@@ -215,16 +238,35 @@ router.get('/player', authenticate, async (req, res) => {
             attributes: ['id', 'name', 'description', 'cover', 'originalCover', 'createdAt', 'updatedAt'],
         });
 
-        // Aggiungi link completo alle cover
-        const playerRoomsWithLinks = playerRooms.map(room => ({
-            ...room.toJSON(),
-            resizedCover: room.cover ? `${BASE_URL}${room.cover}` : null, // URL ridimensionato
-            originalCover: room.originalCover ? `${BASE_URL}${room.originalCover}` : null, // URL originale
-        }));
+        const playerRoomsWithDetails = await Promise.all(
+            playerRooms.map(async (room) => {
+                const participants = await RoomUser.findAll({
+                    where: { roomId: room.id },
+                    include: {
+                        model: User,
+                        attributes: ['id', 'username'],
+                    },
+                    attributes: ['role'],
+                });
+
+                const formattedParticipants = participants.map((participant) => ({
+                    id: participant.User.id,
+                    username: participant.User.username,
+                    role: participant.role,
+                }));
+
+                return {
+                    ...room.toJSON(),
+                    resizedCover: room.cover ? `${BASE_URL}${room.cover}` : null,
+                    originalCover: room.originalCover ? `${BASE_URL}${room.originalCover}` : null,
+                    participants: formattedParticipants,
+                };
+            })
+        );
 
         res.status(200).json({
             message: 'Lista delle stanze di cui sei Player recuperata con successo.',
-            rooms: playerRoomsWithLinks,
+            rooms: playerRoomsWithDetails,
         });
     } catch (err) {
         console.error('Errore durante il recupero delle stanze Player:', err);
@@ -335,70 +377,66 @@ router.put('/:roomId/editRoom', authenticate, upload.single('cover'), async (req
         const { roomId } = req.params;
         const { name, description } = req.body;
 
-        // Recupera la stanza dal database
         const room = await Room.findByPk(roomId);
         if (!room) {
             return res.status(404).json({ error: 'Stanza non trovata.' });
         }
 
-        // Verifica se l'utente è il creatore della stanza
         if (room.createdBy !== req.user.id) {
             return res.status(403).json({ error: 'Solo il creatore della stanza può modificarla.' });
         }
 
-        // Gestione dell'immagine fornita
         let originalCoverPath = room.originalCover;
         let resizedCoverPath = room.cover;
 
         if (req.file) {
-            const userFolder = path.join('images/covers', `${req.user.id}`); // Cartella dell'utente
+            const userFolder = path.join('images/covers', `${req.user.id}`);
             if (!fs.existsSync(userFolder)) {
-                fs.mkdirSync(userFolder, { recursive: true }); // Crea la cartella se non esiste
+                fs.mkdirSync(userFolder, { recursive: true });
             }
 
-            // Ottieni estensione del file
             const fileExtension = path.extname(req.file.originalname);
-
-            // Rinomina i file
             const originalFileName = `${roomId}_room${fileExtension}`;
             const resizedFileName = `${roomId}_room_resized${fileExtension}`;
             const originalPath = path.join(userFolder, originalFileName);
             const resizedPath = path.join(userFolder, resizedFileName);
 
-            // Salva l'immagine originale
+            await sharp(req.file.path).toFile(originalPath);
             await sharp(req.file.path)
-                .toFile(originalPath);
-
-            // Ridimensiona e salva la versione ridotta
-            await sharp(req.file.path)
-                .resize(600, 400, { fit: 'inside' }) // Dimensioni più piccole per la cover ridimensionata
+                .resize(600, 400, { fit: 'inside' })
                 .toFile(resizedPath);
 
-            // Aggiorna i percorsi dei file
             originalCoverPath = path.join('covers', `${req.user.id}`, originalFileName).replace(/\\/g, '/');
             resizedCoverPath = path.join('covers', `${req.user.id}`, resizedFileName).replace(/\\/g, '/');
 
-            // Elimina il file originale caricato
-            fs.unlinkSync(req.file.path);
+            if (fs.existsSync(req.file.path)) {
+                fs.unlink(req.file.path, (err) => {
+                    if (err) {
+                        console.error(`Errore durante l'eliminazione del file: ${err.message}`);
+                    } else {
+                        console.log(`File eliminato con successo: ${req.file.path}`);
+                    }
+                });
+            } else {
+                console.warn(`File non trovato: ${req.file.path}`);
+            }
         }
 
-        // Aggiorna i dettagli della stanza
-        room.name = name || room.name; // Aggiorna solo se fornito
-        room.description = description || room.description; // Aggiorna solo se fornito
+        room.name = name || room.name;
+        room.description = description || room.description;
         room.originalCover = originalCoverPath;
         room.cover = resizedCoverPath;
 
-        await room.save(); // Salva le modifiche
+        await room.save();
 
-        // Rispondi con i dettagli aggiornati della stanza
         res.status(200).json({
             message: 'Stanza modificata con successo!',
             room: {
                 id: room.id,
                 name: room.name,
                 description: room.description,
-                originalCover: `${BASE_URL}${originalCoverPath}`, // Immagine originale
-                resizedCover: `${BASE_URL}${resizedCoverPath}`, // Immagine ridimensionata
+                originalCover: `${BASE_URL}${originalCoverPath}`,
+                resizedCover: `${BASE_URL}${resizedCoverPath}`,
                 createdBy: room.createdBy,
                 createdAt: room.createdAt,
                 updatedAt: room.updatedAt,
@@ -408,6 +446,50 @@ router.put('/:roomId/editRoom', authenticate, upload.single('cover'), async (req
         console.error('Errore durante la modifica della stanza:', err);
         res.status(500).json({
             error: 'Errore durante la modifica della stanza.',
+            details: err.message,
+        });
+    }
+});
+
+router.get('/:roomId/loadRoom', authenticate, async (req, res) => {
+    console.log('Richiesta per caricare i dati della stanza ricevuta.');
+
+    try {
+        const { roomId } = req.params; // Recupera il roomId dai parametri
+
+        // Recupera la stanza dal database
+        const room = await Room.findByPk(roomId);
+        if (!room) {
+            return res.status(404).json({ error: 'Stanza non trovata.' });
+        }
+
+        // Verifica se l'utente ha accesso alla stanza
+        const isParticipant = await RoomUser.findOne({
+            where: { roomId, userId: req.user.id }
+        });
+
+        if (!isParticipant) {
+            return res.status(403).json({ error: 'Accesso negato alla stanza.' });
+        }
+
+        // Rispondi con i dettagli completi della stanza
+        res.status(200).json({
+            message: 'Dati della stanza recuperati con successo.',
+            room: {
+                id: room.id,
+                name: room.name,
+                description: room.description,
+                originalCover: room.originalCover ? `${BASE_URL}${room.originalCover}` : null,
+                resizedCover: room.cover ? `${BASE_URL}${room.cover}` : null,
+                createdBy: room.createdBy,
+                createdAt: room.createdAt,
+                updatedAt: room.updatedAt,
+            },
+        });
+    } catch (err) {
+        console.error('Errore durante il caricamento della stanza:', err);
+        res.status(500).json({
+            error: 'Errore durante il caricamento della stanza.',
             details: err.message,
         });
     }

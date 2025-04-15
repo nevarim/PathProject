@@ -1,0 +1,29 @@
+<div id="tokens-container">
+    <h2>I tuoi Token</h2>
+
+    <!-- Upload Singolo -->
+    <div id="upload-single-container">
+        <button id="toggle-upload-single">Upload Singolo</button>
+        <div id="upload-single" style="display: none;">
+            <input type="text" id="single-token-name" placeholder="Nome del Token" />
+            <input type="file" id="single-token-file" />
+            <button id="upload-single-btn">Carica</button>
+        </div>
+    </div>
+
+    <!-- Upload Multiplo -->
+    <div id="upload-multiple-container">
+        <button id="toggle-upload-multiple">Upload Multiplo</button>
+        <div id="upload-multiple" style="display: none;">
+            <input type="file" id="multiple-token-files" multiple />
+            <button id="upload-multiple-btn">Carica</button>
+        </div>
+    </div>
+
+    <!-- Lista dei Token -->
+    <div id="tokens-list">
+        <!-- I token verranno generati dinamicamente qui -->
+    </div>
+</div>
+<script src="/js/gameTokens.js" defer></script>
+<link rel="stylesheet" href="/css/gameTokens.css">

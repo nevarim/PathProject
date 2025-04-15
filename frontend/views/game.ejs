@@ -3,60 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= process.env.REACT_APP_PROJECT_NAME %></title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <title><%= process.env.REACT_APP_PROJECT_NAME %> - Game</title>
     <link rel="stylesheet" href="/css/game.css">
-    <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script> <!-- Inclusione Socket.IO -->
-    <script>
-        // Definisci l'URL del backend come variabile globale per il frontend
-        const BACKEND_URL = "<%= process.env.BACKEND_URL %>";
-        console.log(`Backend URL: ${BACKEND_URL}`);
-    </script>
+    <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
+    <script src="/js/config.js" defer></script>
+    <script src="/js/indexuserutils.js" defer></script>
+    <script src="/js/indexroomutils.js" defer></script>
 </head>
 <body>
-    <div id="game-container">
-        <!-- Area della mappa -->
-        <section id="map-section">
-            <canvas id="game-map"></canvas>
-        </section>
-
-        <!-- Resizer per il ridimensionamento -->
-        <div id="resizer"></div>
-
-        <!-- Pannelli con tab -->
-        <section id="panel-section">
-            <div id="tabs">
-                <button class="tab active" data-tab="chat">Chat</button>
-                <button class="tab" data-tab="art-library">Art Library</button>
-                <button class="tab" data-tab="journal">Journal</button>
-                <button class="tab" data-tab="compendium">Compendium</button>
-                <button class="tab" data-tab="jukebox">Jukebox</button>
-                <button class="tab" data-tab="collection">Collection</button>
-                <button class="tab" data-tab="my-settings">My Settings</button>
-            </div>
-            <div id="tab-content">
-                <!-- Contenuto Chat -->
-                <div class="tab-pane active" id="chat">
-                    <h2>Chat</h2>
-                    <div id="chat-messages"></div>
-                    <form id="chat-form">
-                        <input type="text" id="chat-input" placeholder="Scrivi un messaggio..." required />
-                        <button type="submit">Invia</button>
-                    </form>
-                </div>
-                <!-- Altri pannelli -->
-                <div class="tab-pane" id="art-library"><h2>Art Library</h2></div>
-                <div class="tab-pane" id="journal"><h2>Journal</h2></div>
-                <div class="tab-pane" id="compendium"><h2>Compendium</h2></div>
-                <div class="tab-pane" id="jukebox"><h2>Jukebox</h2></div>
-                <div class="tab-pane" id="collection"><h2>Collection</h2></div>
-                <div class="tab-pane" id="my-settings"><h2>My Settings</h2></div>
-            </div>
-        </section>
+    <div id="game-layout">
+        <!-- Mappa -->
+        <div id="map-area">
+            <%- include('gameMap') %> <!-- Include la mappa -->
+        </div>
+        
+        <!-- Tabs -->
+        <div id="tabs-area">
+            <%- include('gameTabs') %> <!-- Include i tabs -->
+        </div>
     </div>
-    <script>
-        // Definisci l'URL del backend come variabile globale per il frontend
-        console.log(`Backend URL: ${BACKEND_URL}`);
-    </script>
+
     <script type="module" src="/js/game.js" defer></script>
 </body>
 </html>

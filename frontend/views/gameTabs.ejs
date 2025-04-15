@@ -1,0 +1,30 @@
+<script src="/js/gameTabs.js" defer></script>
+<link rel="stylesheet" href="/css/gameTabs.css">
+
+<div id="tabs-container">
+    <!-- Navigazione tra le tab -->
+    <div id="tabs-navigation">
+        <button class="tab-button active" data-tab="chat">Chat</button>
+        <button class="tab-button" data-tab="tokens">Tokens</button>
+        <button class="tab-button" data-tab="notes">Note</button>
+    </div>
+
+    <!-- Contenuto delle tab -->
+    <div id="tabs-content">
+        <!-- Contenuto della tab Chat -->
+        <div class="tab-content active" data-tab="chat">
+            <%- include('gameChat') %> <!-- Include il contenuto della chat -->
+        </div>
+
+        <!-- Contenuto della tab tokens -->
+        <div class="tab-content" data-tab="tokens">
+            <%- include('gameTokens') %> <!-- Include il contenuto della chat -->
+        </div>
+
+        <!-- Contenuto della tab Note -->
+        <div class="tab-content" data-tab="notes">
+            <h2>Note</h2>
+            <p>Qui gli utenti possono aggiungere le loro note.</p>
+        </div>
+    </div>
+</div>
