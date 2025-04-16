@@ -1,0 +1,77 @@
+/* Contenitore principale */
+#map-selector {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #333; /* Sfondo scuro */
+    color: #fff; /* Testo bianco */
+    height: 100vh;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+
+/* Titolo */
+#map-selector h1 {
+    margin-bottom: 20px;
+    font-size: 2rem;
+    color: #4caf50; /* Verde brillante */
+}
+
+/* Contenitore delle mappe */
+#maps-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 100px); /* Riquadri di 100px */
+    gap: 15px; /* Spaziatura tra i riquadri */
+    justify-content: center;
+    width: 100%;
+    max-width: 800px; /* Limita la larghezza */
+    padding: 10px;
+}
+
+/* Riquadro singolo */
+.map-card {
+    width: 100px; /* Larghezza del riquadro */
+    height: 60px; /* Altezza del riquadro */
+    background-color: #444; /* Sfondo del riquadro */
+    border-radius: 8px;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3); /* Effetto ombra */
+    overflow: hidden; /* Nasconde overflow dell'immagine */
+    text-align: center;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s; /* Effetto hover */
+}
+
+.map-card:hover {
+    transform: scale(1.05); /* Ingrandimento al passaggio del mouse */
+}
+
+/* Immagine della mappa */
+.map-card img {
+    width: 100%; /* Immagine adattata al riquadro */
+    height: 100%; /* Altezza adattata al riquadro */
+    object-fit: cover; /* Mantieni proporzioni e riempi il riquadro */
+}
+
+/* Pulsante per aggiungere una mappa */
+.add-map-btn {
+    width: 60px;
+    height: 60px;
+    background-color: #4caf50; /* Sfondo verde */
+    color: #fff; /* Testo bianco */
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    cursor: pointer;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+    transition: transform 0.2s, background-color 0.2s;
+}
+
+.add-map-btn:hover {
+    transform: scale(1.1); /* Ingrandimento al passaggio del mouse */
+    background-color: #81c784; /* Verde più chiaro */
+}

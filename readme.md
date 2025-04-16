@@ -750,54 +750,97 @@ Body (JSON):
 }
 
 
-Risultato Atteso:
-- Token spostato con successo.
-- La risposta include le nuove coordinate del token.
 
 
-Test su Postman
-- Aggiunta di Token:- Seleziona POST e inserisci l'URL.
-- Inserisci mapId nell'URL e compila il Body.
-- Verifica che il token venga aggiunto correttamente.
-
-- Recupero dei Token:- Seleziona GET, sostituisci mapId nell'URL.
-- Conferma che i token associati alla mappa vengano restituiti.
-
-- Movimento Token:- Seleziona PUT, sostituisci mapId e mapTokenId nell'URL.
-- Compila il Body con le nuove coordinate.
-
-
-
-
-1. Caricamento di una Mappa
+Aggiunta o Aggiornamento di una Mappa
 Metodo: POST
-URL: http://<tuo_server>/map/upload
+URL: /map/upload
 Headers:
 Authorization: Bearer <token>
 Content-Type: multipart/form-data
 
 
 Body (form-data):
-- map: [file] (scegli un file da caricare)
-- name: Nome della mappa (es. "Dungeon 1")
-- description: Descrizione della mappa (es. "Mappa del dungeon sotterraneo")
-- roomId: ID della stanza (es. 1)
-- mapSize: Dimensioni della mappa (es. "1000x800")
-- gridSize: Dimensioni della griglia (es. "50x50")
+map: [file] (scegli un file da caricare)
+name: Nome della mappa (es. "Dungeon 1")
+description: Descrizione della mappa (es. "Una mappa del dungeon sotterraneo")
+roomId: ID della stanza (es. "1")
+mapSize: Dimensione della mappa (es. "1000x800")
+gridSize: Dimensione della griglia (es. "50x50")
 
-Risultato Atteso:
-- Risposta di successo con dettagli della mappa caricata:{
+
+
+Esempio di Risultato Atteso
+Mappa Nuova
+{
     "message": "Mappa caricata e registrata con successo!",
     "map": {
         "id": 1,
-        "name": "Dungeon 1",
-        "description": "Mappa del dungeon sotterraneo",
+        "userId": 2,
         "roomId": 1,
+        "filePath": "images/maps/2/1/Dungeon.png",
+        "name": "Dungeon",
+        "description": "Una mappa del dungeon sotterraneo",
         "mapSize": "1000x800",
         "gridSize": "50x50",
-        "filePath": "uploads/filename.png"
+        "isVisibleToPlayers": true,
+        "createdAt": "2025-04-15T10:00:00.000Z",
+        "updatedAt": "2025-04-15T10:00:00.000Z"
     }
 }
+
+
+Mappa Esistente Aggiornata
+{
+    "message": "Mappa aggiornata con successo!",
+    "map": {
+        "id": 1,
+        "userId": 2,
+        "roomId": 1,
+        "filePath": "images/maps/2/1/Dungeon.png",
+        "name": "Dungeon",
+        "description": "Descrizione aggiornata",
+        "mapSize": "1200x900",
+        "gridSize": "60x60",
+        "isVisibleToPlayers": true,
+        "createdAt": "2025-04-15T10:00:00.000Z",
+        "updatedAt": "2025-04-15T10:20:00.000Z"
+    }
+}
+
+
+
+
+
+
+3. Recupero dei dettagli di una mappa
+Metodo: GET
+URL: /map/:mapId
+Headers:
+Authorization: Bearer <token>
+
+
+
+4. Modifica delle informazioni di una mappa
+Metodo: PUT
+URL: /map/:mapId
+Headers:
+Authorization: Bearer <token>
+Content-Type: application/json
+
+
+Body (JSON):
+{
+    "name": "Nome aggiornato",
+    "description": "Descrizione aggiornata",
+    "mapSize": "Nuova dimensione della mappa (es. 1200x900)",
+    "gridSize": "Nuova dimensione della griglia (es. 60x60)",
+    "isVisibleToPlayers": true
+}
+
+
+
+
 
 
 

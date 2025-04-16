@@ -1,0 +1,53 @@
+/* Contenitore principale */
+#map-settings {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #333; /* Sfondo scuro */
+    color: #fff; /* Testo bianco */
+    height: 100vh;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+
+/* Form */
+#map-details-form {
+    background-color: #444; /* Sfondo del form */
+    border-radius: 8px;
+    padding: 20px;
+    width: 400px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+#map-details-form label {
+    display: block;
+    margin-top: 10px;
+    font-weight: bold;
+    color: #fff;
+}
+
+#map-details-form input, #map-details-form textarea, #map-details-form select {
+    width: 100%;
+    margin-top: 5px;
+    padding: 10px;
+    background-color: #555;
+    border: none;
+    border-radius: 5px;
+    color: #fff; /* Testo bianco */
+}
+
+button {
+    margin-top: 20px;
+    width: 100%;
+    padding: 10px;
+    background-color: #4caf50; /* Verde brillante */
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+button:hover {
+    background-color: #81c784; /* Verde chiaro */
+}

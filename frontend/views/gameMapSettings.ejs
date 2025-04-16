@@ -1,0 +1,46 @@
+
+<div id="map-settings">
+    <!-- Titolo -->
+    <h1>Gestione della Mappa</h1>
+
+    <!-- Form per visualizzare e modificare i dettagli della mappa -->
+    <div id="map-details">
+        <form id="map-details-form">
+            <!-- ID della mappa -->
+            <label for="map-id">ID Mappa:</label>
+            <input type="text" id="map-id" placeholder="Es. 123" disabled />
+
+            <!-- Nome della mappa -->
+            <label for="map-name">Nome Mappa:</label>
+            <input type="text" id="map-name" placeholder="Nome della mappa" />
+
+            <!-- Descrizione della mappa -->
+            <label for="map-description">Descrizione:</label>
+            <textarea id="map-description" placeholder="Descrizione della mappa"></textarea>
+
+            <!-- Dimensione della mappa -->
+            <label for="map-size">Dimensione della Mappa (Larghezza x Altezza):</label>
+            <input type="text" id="map-size" placeholder="Es. 1200x900" />
+
+            <!-- Dimensione della griglia -->
+            <label for="grid-size">Dimensione della Griglia (px):</label>
+            <input type="text" id="grid-size" placeholder="Es. 50" />
+
+            <!-- Visibilità ai giocatori -->
+            <label for="visibility">Visibile ai giocatori:</label>
+            <select id="visibility">
+                <option value="true">Sì</option>
+                <option value="false">No</option>
+            </select>
+
+            <!-- Pulsanti -->
+            <button type="button" id="get-map-btn">Recupera Dettagli</button>
+            <button type="button" id="update-map-btn">Aggiorna Mappa</button>
+        </form>
+    </div>
+</div>
+
+
+
+<script src="/js/gameMapSettings.js" defer></script>
+<link rel="stylesheet" href="/css/gameMapSettings.css">

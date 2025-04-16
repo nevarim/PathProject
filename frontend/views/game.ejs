@@ -10,20 +10,28 @@
     <script src="/js/config.js" defer></script>
     <script src="/js/indexuserutils.js" defer></script>
     <script src="/js/indexroomutils.js" defer></script>
+    <script src="/js/game.js" defer></script>
 </head>
 <body>
+    <div class="gameMapSelector" id="gameMapSelector">
+        <div class="gameMapSelectorcontent">
+            <%- include('gameMapSelector') %> <!-- Include i tabs -->
+        </div>
+    </div>
+    <div class="gameMapSelectorFlag" onclick="toggleGameMapSelector()">Maps</div>
+
+
+
     <div id="game-layout">
         <!-- Mappa -->
         <div id="map-area">
             <%- include('gameMap') %> <!-- Include la mappa -->
         </div>
-        
         <!-- Tabs -->
         <div id="tabs-area">
             <%- include('gameTabs') %> <!-- Include i tabs -->
         </div>
     </div>
 
-    <script type="module" src="/js/game.js" defer></script>
 </body>
 </html>

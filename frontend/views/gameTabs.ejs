@@ -6,7 +6,7 @@
     <div id="tabs-navigation">
         <button class="tab-button active" data-tab="chat">Chat</button>
         <button class="tab-button" data-tab="tokens">Tokens</button>
-        <button class="tab-button" data-tab="notes">Note</button>
+        <button class="tab-button" data-tab="MapSettings">Mappa</button>
     </div>
 
     <!-- Contenuto delle tab -->
@@ -22,9 +22,8 @@
         </div>
 
         <!-- Contenuto della tab Note -->
-        <div class="tab-content" data-tab="notes">
-            <h2>Note</h2>
-            <p>Qui gli utenti possono aggiungere le loro note.</p>
+        <div class="tab-content" data-tab="MapSettings">
+            <%- include('gameMapSettings') %> <!-- Include il contenuto della chat -->
         </div>
     </div>
 </div>

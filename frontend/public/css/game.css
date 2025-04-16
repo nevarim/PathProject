@@ -1,3 +1,17 @@
+/* Rimuove i margini e padding predefiniti di body e html */
+html, body {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box; /* Assicura che il padding sia incluso nelle dimensioni */
+}
+
+* {
+    box-sizing: inherit; /* Estende il comportamento del box-sizing */
+}
+#game-layout {
+    outline: 2px solid red; /* Per evidenziare i confini */
+}
+
 /* Layout principale */
 #game-layout {
     display: flex; /* Utilizza Flexbox per suddividere lo spazio */
@@ -22,4 +36,58 @@
     color: #fff; /* Testo bianco */
     overflow-y: auto; /* Abilita lo scorrimento verticale */
     border-left: 2px solid #4caf50; /* Bordo visivo tra mappa e tabs */
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.gameMapSelector {
+    position: fixed;
+    top: -300px; /* Div inizialmente nascosto */
+    left: 40%;
+    transform: translateX(-50%);
+    width: 85%;
+    max-width: 900px;
+    background-color: #333;
+    border: 2px solid #000000;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    transition: top 0.5s ease;
+}
+
+.gameMapSelectorFlag {
+    position: fixed;
+    top: 10px; /* Posiziona la linguetta al centro verticale della pagina */
+    left: calc(50% + 250px); /* Allinea la linguetta a destra del div */
+    transform: translateY(-50%);
+    width: 50px;
+    height: 50px;
+    background-color: #4caf50;
+    border-radius: 50%;
+    cursor: pointer;
+    text-align: center;
+    line-height: 50px;
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.gameMapSelectorFlag:hover {
+    background-color: #4caf50;
+}
+
+.gameMapSelectorcontent {
+    padding: 20px;
 }
