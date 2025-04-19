@@ -701,7 +701,7 @@ Punti Importanti
 
 1. Aggiungi un Token a una Mappa
 Metodo: POST
-URL: http://<tuo_server>/api/map-tokens/:mapId/add-token
+URL: http://<tuo_server>/maptokens/:mapId/add-token
 Headers:
 Authorization: Bearer <token>
 Content-Type: application/json
@@ -725,7 +725,7 @@ Risultato Atteso:
 
 2. Recupera i Token di una Mappa
 Metodo: GET
-URL: http://<tuo_server>/api/map-tokens/:mapId/tokens
+URL: http://<tuo_server>/maptokens/:mapId/tokens
 Headers:
 Authorization: Bearer <token>
 
@@ -737,7 +737,7 @@ Risultato Atteso:
 
 3. Sposta un Token sulla Griglia
 Metodo: PUT
-URL: http://<tuo_server>/api/map-tokens/:mapId/token/:mapTokenId/move
+URL: http://<tuo_server>/maptokens/:mapId/token/:mapTokenId/move
 Headers:
 Authorization: Bearer <token>
 Content-Type: application/json
@@ -1011,6 +1011,254 @@ Risultato Atteso:
         { "id": 2, "x": 4, "y": 6, "width": 2, "height": 2, "isVisible": false }
     ]
 }
+
+
+
+
+1. Rotte Aggiunte per le Categorie
+Aggiorna il file tokenimagesRoutes.js aggiungendo le seguenti rotte.
+const TokenCategory = require('../models/TokenCategory'); // Importa il modello delle categorie
+
+// **1. Creazione di una nuova categoria**
+router.post('/categories', authenticate, async (req, res) => {
+    try {
+        const { name } = req.body;
+
+        if (!name) {
+            return res.status(400).json({ error: 'Il nome della categoria è obbligatorio.' });
+        }
+
+        const existingCategory = await TokenCategory.findOne({ where: { name } });
+        if (existingCategory) {
+            return res.status(400).json({ error: 'La categoria esiste già.' });
+        }
+
+        const category = await TokenCategory.create({ name });
+        res.status(201).json({ message: 'Categoria creata con successo!', category });
+    } catch (error) {
+        console.error('Errore durante la creazione della categoria:', error);
+        res.status(500).json({ error: 'Errore interno al server.' });
+    }
+});
+
+// **2. Recupera tutte le categorie**
+router.get('/categories', authenticate, async (req, res) => {
+    try {
+        const categories = await TokenCategory.findAll();
+        res.status(200).json({ message: 'Categorie recuperate con successo!', categories });
+    } catch (error) {
+        console.error('Errore durante il recupero delle categorie:', error);
+        res.status(500).json({ error: 'Errore interno al server.' });
+    }
+});
+
+// **3. Aggiorna una categoria esistente**
+router.put('/categories/:id', authenticate, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { name } = req.body;
+
+        const category = await TokenCategory.findByPk(id);
+        if (!category) {
+            return res.status(404).json({ error: 'Categoria non trovata.' });
+        }
+
+        if (name) category.name = name;
+        await category.save();
+
+        res.status(200).json({ message: 'Categoria aggiornata con successo!', category });
+    } catch (error) {
+        console.error('Errore durante l\'aggiornamento della categoria:', error);
+        res.status(500).json({ error: 'Errore interno al server.' });
+    }
+});
+
+// **4. Elimina una categoria**
+router.delete('/categories/:id', authenticate, async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const category = await TokenCategory.findByPk(id);
+        if (!category) {
+            return res.status(404).json({ error: 'Categoria non trovata.' });
+        }
+
+        await category.destroy();
+        res.status(200).json({ message: 'Categoria eliminata con successo.' });
+    } catch (error) {
+        console.error('Errore durante l\'eliminazione della categoria:', error);
+        res.status(500).json({ error: 'Errore interno al server.' });
+    }
+});
+
+
+// **5. Recupera i token di una categoria specifica**
+router.get('/categories/:id/tokens', authenticate, async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const category = await TokenCategory.findByPk(id, {
+            include: [
+                { model: TokenImage, as: 'tokens', attributes: ['id', 'name', 'url'] },
+            ],
+        });
+
+        if (!category) {
+            return res.status(404).json({ error: 'Categoria non trovata.' });
+        }
+
+        res.status(200).json({
+            message: 'Token associati alla categoria recuperati con successo!',
+            tokens: category.tokens,
+        });
+    } catch (error) {
+        console.error('Errore durante il recupero dei token della categoria:', error);
+        res.status(500).json({ error: 'Errore interno al server.' });
+    }
+});
+
+
+
+Creazione di una Categoria
+Metodo: POST
+URL: /tokenimages/categories
+Headers:
+Authorization: Bearer <token>
+Content-Type: application/json
+
+
+Body:
+{
+    "name": "Mostri"
+}
+
+
+
+Recupero di tutte le Categorie
+Metodo: GET
+URL: /tokenimages/categories
+Headers:
+Authorization: Bearer <token>
+
+
+
+Aggiornamento di una Categoria
+Metodo: PUT
+URL: /tokenimages/categories/:id
+Headers:
+Authorization: Bearer <token>
+Content-Type: application/json
+
+
+Body:
+{
+    "name": "Personaggi"
+}
+
+
+
+Eliminazione di una Categoria
+Metodo: DELETE
+URL: /tokenimages/categories/:id
+Headers:
+Authorization: Bearer <token>
+
+
+
+Recupero dei Token di una Categoria
+Metodo: GET
+URL: /tokenimages/categories/:id/tokens
+Headers:
+Authorization: Bearer <token>
+
+
+
+
+Assegna una Categoria a un Token
+Metodo: PUT
+URL: /tokenimages/:id/assign-category
+Headers:
+Authorization: Bearer <token>
+Content-Type: application/json
+
+
+Body (JSON):
+{
+    "categoryId": 1
+}
+
+
+Descrizione:
+- :id: L'ID del token a cui vuoi assegnare una categoria.
+- categoryId: L'ID della categoria che vuoi associare al token.
+
+Esempio di Risultato Atteso:
+{
+    "message": "Categoria assegnata al token con successo.",
+    "token": {
+        "id": 1,
+        "name": "Esempio Token",
+        "url": "images/tokens/2/example.png",
+        "categoryId": 1,
+        "createdAt": "2025-04-15T10:00:00.000Z",
+        "updatedAt": "2025-04-15T10:20:00.000Z"
+    }
+}
+
+
+Recupera i Token di una Categoria e di un Utente
+Metodo: GET
+URL: /tokenimages/categories/:categoryId/users/:userId/tokens
+Headers:
+Authorization: Bearer <token>
+
+
+Descrizione:
+- :categoryId: L'ID della categoria per cui recuperare i token.
+- :userId: L'ID dell'utente a cui appartengono i token.
+
+
+Esempio di Richiesta
+URL di esempio:
+http://<tuo_server>/tokenimages/categories/1/users/2/tokens
+Headers:
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9... (il token dell'utente autenticato)
+
+
+
+Risultati Attesi
+Successo (200 OK):
+{
+    "message": "Token associati alla categoria e all'utente recuperati con successo!",
+    "tokens": [
+        {
+            "id": 5,
+            "name": "Mostro Goblin",
+            "url": "images/tokens/2/goblin.png"
+        },
+        {
+            "id": 8,
+            "name": "Mostro Troll",
+            "url": "images/tokens/2/troll.png"
+        }
+    ]
+}
+
+
+Errori Possibili:
+- Categoria non trovata (404 Not Found):{
+    "error": "Categoria non trovata."
+}
+
+- Nessun Token Associato (404 Not Found):{
+    "error": "Nessun token trovato per questa categoria e utente."
+}
+
+- Errore Interno al Server (500 Internal Server Error):{
+    "error": "Errore interno al server."
+}
+
+
 
 
 

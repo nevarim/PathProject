@@ -1,7 +1,7 @@
 /* Contenitore principale per i token */
 #tokens-container {
-    width: 100%;
-    max-width: 300px;
+    width: 400px; /* Aumenta la larghezza */
+    max-width: 400px;
     background-color: #2b2b2b; /* Grigio scuro */
     color: #fff; /* Testo bianco */
     padding: 15px;
@@ -19,11 +19,13 @@
 }
 
 /* Upload container */
-#upload-single-container, #upload-multiple-container {
+#upload-single-container,
+#upload-multiple-container {
     margin-bottom: 15px;
 }
 
-#upload-single-container button, #upload-multiple-container button {
+#upload-single-container button,
+#upload-multiple-container button {
     width: 100%;
     padding: 10px;
     font-size: 1em;
@@ -35,11 +37,13 @@
     transition: background-color 0.3s ease;
 }
 
-#upload-single-container button:hover, #upload-multiple-container button:hover {
+#upload-single-container button:hover,
+#upload-multiple-container button:hover {
     background-color: #81c784;
 }
 
-#upload-single, #upload-multiple {
+#upload-single,
+#upload-multiple {
     margin-top: 10px;
     padding: 10px;
     background-color: #333;
@@ -49,7 +53,8 @@
     gap: 10px;
 }
 
-#upload-single input, #upload-multiple input {
+#upload-single input,
+#upload-multiple input {
     padding: 8px;
     background-color: #444;
     color: #fff;
@@ -57,7 +62,8 @@
     border-radius: 5px;
 }
 
-#upload-single-btn, #upload-multiple-btn {
+#upload-single-btn,
+#upload-multiple-btn {
     padding: 10px;
     background-color: #4caf50;
     color: #fff;
@@ -66,7 +72,8 @@
     cursor: pointer;
 }
 
-#upload-single-btn:hover, #upload-multiple-btn:hover {
+#upload-single-btn:hover,
+#upload-multiple-btn:hover {
     background-color: #81c784;
 }
 
@@ -77,20 +84,53 @@
     gap: 10px;
 }
 
+/* Stile del contenitore di categoria */
+.category-token-container {
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    background-color: #f9f9f9;
+}
+
+/* Stili per il titolo della categoria (rendilo cliccabile) */
+.category-title {
+    cursor: pointer;
+    padding: 10px;
+    background-color: #eee;
+    border-bottom: 1px solid #ddd;
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.category-title:hover {
+    background-color: #ddd;
+}
+
+/* Stili per la griglia dei token all'interno della categoria */
+.token-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); /* Adatta la larghezza minima */
+    gap: 5px; /* Ridotto il gap */
+    padding: 5px; /* Aggiunto un po' di padding interno */
+}
+
 /* Stile del singolo token */
 .token-item {
     background-color: #333; /* Grigio più chiaro */
     color: #fff; /* Testo bianco */
-    padding: 10px;
+    padding: 8px; /* Ridotto il padding */
     border-radius: 5px;
     border: 1px solid #444; /* Bordo sottile */
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    font-size: 1em;
+    flex-direction: column; /* Imposta la direzione a colonna */
+    align-items: center; /* Allinea gli elementi al centro */
+    justify-content: center; /* Centra verticalmente */
+    gap: 5px; /* Ridotto il gap */
+    font-size: 0.9em; /* Dimensione del font leggermente ridotta */
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.2s ease;
+    text-align: center; /* Centra il testo del nome */
 }
 
 .token-item:hover {
@@ -100,21 +140,52 @@
 
 /* Immagine del token */
 .token-item img {
-    width: 40px;
-    height: 40px;
+    width: 50px; /* Aumenta leggermente la dimensione dell'immagine */
+    height: 50px;
     border-radius: 5px;
     border: 1px solid #444;
+    margin-bottom: 2px; /* Spazio tra immagine e nome */
+}
+
+/* Contenitore per le icone di modifica e cancellazione */
+.token-actions-container {
+    display: flex;
+    flex-direction: column; /* Imposta la direzione a colonna */
+    gap: 5px; /* Spazio tra le icone */
+    margin-top: 5px; /* Spazio dal nome del token */
 }
 
 /* Icone di modifica e cancellazione */
-.token-actions {
-    display: flex;
-    gap: 10px;
-}
-
-.token-actions i {
-    font-size: 1.2em;
+.token-actions-container i {
+    font-size: 1em; /* Dimensione delle icone */
     cursor: pointer;
     transition: color 0.3s ease;
+    padding: 3px; /* Aggiunge un po' di padding intorno all'icona per cliccabilità */
+    border-radius: 3px;
 }
 
+.token-actions-container i:hover {
+    background-color: #444; /* Feedback visivo al passaggio del mouse */
+}
+
+/* Riquadro Anteprima */
+#preview-container {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    text-align: center;
+    background-color: #fff;
+    height: 200px; /* Altezza del riquadro */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#token-preview {
+    max-width: 100%;
+    max-height: 100%;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    object-fit: contain; /* Mantiene le proporzioni */
+}

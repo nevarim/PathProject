@@ -3,8 +3,8 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    background-color: #333; /* Sfondo scuro */
-    color: #fff; /* Testo bianco */
+    background-color: #333;
+    color: #fff;
     height: 100vh;
     padding: 20px;
     font-family: Arial, sans-serif;
@@ -14,64 +14,57 @@
 #map-selector h1 {
     margin-bottom: 20px;
     font-size: 2rem;
-    color: #4caf50; /* Verde brillante */
+    color: #4caf50;
 }
 
 /* Contenitore delle mappe */
 #maps-container {
     display: grid;
-    grid-template-columns: repeat(auto-fill, 100px); /* Riquadri di 100px */
-    gap: 15px; /* Spaziatura tra i riquadri */
+    grid-template-columns: repeat(auto-fill, 100px);
+    gap: 15px;
     justify-content: center;
     width: 100%;
-    max-width: 800px; /* Limita la larghezza */
+    max-width: 800px;
     padding: 10px;
 }
 
 /* Riquadro singolo */
 .map-card {
-    width: 100px; /* Larghezza del riquadro */
-    height: 60px; /* Altezza del riquadro */
-    background-color: #444; /* Sfondo del riquadro */
+    width: 100px;
+    height: 60px;
+    background-color: #444;
     border-radius: 8px;
-    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3); /* Effetto ombra */
-    overflow: hidden; /* Nasconde overflow dell'immagine */
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
     text-align: center;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: transform 0.2s; /* Effetto hover */
+    transition: transform 0.2s;
 }
 
 .map-card:hover {
-    transform: scale(1.05); /* Ingrandimento al passaggio del mouse */
+    transform: scale(1.05);
 }
 
-/* Immagine della mappa */
-.map-card img {
-    width: 100%; /* Immagine adattata al riquadro */
-    height: 100%; /* Altezza adattata al riquadro */
-    object-fit: cover; /* Mantieni proporzioni e riempi il riquadro */
-}
-
-/* Pulsante per aggiungere una mappa */
+/* Pulsante "+" per creare una nuova mappa */
 .add-map-btn {
-    width: 60px;
+    width: 100px;
     height: 60px;
-    background-color: #4caf50; /* Sfondo verde */
-    color: #fff; /* Testo bianco */
-    border-radius: 50%;
+    background-color: #4caf50;
+    color: #fff;
+    border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 2rem;
     cursor: pointer;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3);
     transition: transform 0.2s, background-color 0.2s;
 }
 
 .add-map-btn:hover {
-    transform: scale(1.1); /* Ingrandimento al passaggio del mouse */
-    background-color: #81c784; /* Verde più chiaro */
+    transform: scale(1.05);
+    background-color: #81c784;
 }

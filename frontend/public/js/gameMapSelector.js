@@ -18,21 +18,23 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json();
             console.log('✔ Mappe Recuperate:', data.maps);
 
-            renderMaps(data.maps); // Mostra i riquadri delle mappe
+            renderMaps(data.maps); // Mostra mappe e il tasto "+"
         } catch (error) {
             console.error('❌ Errore durante il recupero delle mappe:', error);
-            renderAddMapButton(); // Nessuna mappa trovata
+            renderAddMapButton(); // Mostra solo il tasto "+" in caso di errore
         }
     }
 
-    // Funzione per generare i riquadri delle mappe
+    // Funzione per generare la griglia di mappe
     function renderMaps(maps) {
-        mapsContainer.innerHTML = ''; // Pulizia container
+        mapsContainer.innerHTML = ''; // Pulisce il contenitore
+
         if (maps.length === 0) {
-            renderAddMapButton(); // Mostra pulsante "Aggiungi Mappa" se non ci sono mappe
+            renderAddMapButton(); // Mostra solo il pulsante "+" se non ci sono mappe
             return;
         }
 
+        // Genera un riquadro per ogni mappa
         maps.forEach((map) => {
             const mapCard = document.createElement('div');
             mapCard.classList.add('map-card');
@@ -43,29 +45,79 @@ document.addEventListener('DOMContentLoaded', () => {
 
             mapCard.appendChild(mapImage);
 
-            mapCard.addEventListener('click', () => {
+            // Aggiungi comportamento al click della mappa
+            mapCard.addEventListener('click', async () => {
                 alert(`Hai selezionato la mappa: ${map.name}`);
+                sessionStorage.setItem('mapId', map.id);
+            
+                // Pulisci la mappa precedente
+                window.clearMap(); // Assumendo che clearMap sia globale
+            
+                const mapId = map.id; // Recupera l'ID della mappa
+                const backendUrl = window.CONFIG.BACKEND_URL; // Backend URL
+                const userToken = getStoredData().token; // Recupera il token dell'utente
+            
+                try {
+                    // Effettua la richiesta per ottenere i dettagli della mappa
+                    const response = await fetch(`${backendUrl}/map/${mapId}`, { // URL CORRETTO
+                        method: 'GET',
+                        headers: {
+                            Authorization: `Bearer ${userToken}`,
+                        },
+                    });
+            
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        console.error('❌ Errore durante il recupero dei dettagli della mappa:', errorData);
+                        throw new Error(errorData.message || 'Errore durante il recupero della mappa.');
+                    }
+            
+                    const mapData = await response.json(); // Ottieni i dati della mappa
+                    console.log('✔ Dettagli Mappa Recuperati:', mapData);
+            
+                    // Chiama la funzione per compilare dinamicamente i dettagli
+                    chargeMapDetails(mapData.map);
+            
+                    // Carica i token per la nuova mappa
+                    window.loadMapTokens(mapId); // Assumendo che loadMapTokens sia globale
+            
+                } catch (error) {
+                    console.error('❌ Errore durante il caricamento dei dettagli della mappa:', error.message);
+                    alert(`Errore: ${error.message}. Riprova.`);
+                }
             });
+
 
             mapsContainer.appendChild(mapCard);
         });
+
+        // Aggiungi il pulsante "+" come ultimo elemento
+        renderAddMapButton();
     }
 
-    // Funzione per aggiungere il pulsante "+" quando non ci sono mappe
+    // Funzione per creare il pulsante "+"
     function renderAddMapButton() {
-        mapsContainer.innerHTML = ''; // Pulizia container
-
         const addButton = document.createElement('div');
         addButton.classList.add('add-map-btn');
         addButton.textContent = '+';
 
-        addButton.addEventListener('click', () => {
-            alert('Aggiungi una nuova mappa qui!');
-        });
+        // Al click sul tasto "+", richiama la funzione esterna
+        addButton.addEventListener('click', onCreateMapPopup);
 
         mapsContainer.appendChild(addButton);
     }
 
-    // Recupera la lista delle mappe quando la pagina viene caricata
+    // Recupera la lista delle mappe al caricamento della pagina
     fetchMaps(roomId);
 });
+
+function chargeMapDetails(map) {
+    // Compila la schermata dei dettagli della mappa
+    document.getElementById('map-id').value = map.id || '';
+    document.getElementById('map-name').value = map.name || '';
+    document.getElementById('map-description').value = map.description || '';
+    document.getElementById('map-size').value = map.mapSize || '';
+    document.getElementById('grid-size').value = map.gridSize || '';
+    document.getElementById('visibility').value =
+        map.isVisibleToPlayers !== undefined ? map.isVisibleToPlayers.toString() : 'false';
+}

@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const TokenImage = require('../models/TokenImage');
+const TokenCategory = require('../models/TokenCategory'); // Importa il modello delle categorie
 const { authenticate } = require('../middlewares/auth');
 const multer = require('multer');
 const path = require('path');
@@ -11,12 +12,149 @@ require('dotenv').config(); // Carica le variabili d'ambiente
 const BASE_URL = `http://${process.env.HOSTIP}:${process.env.PORT}/images/`;
 console.log(`BASE_URL configurato: ${BASE_URL}`);
 
+
+
+
 // Funzione per rimuovere caratteri speciali dal nome
 const sanitizeName = (name) => {
     return name.replace(/[^a-zA-Z0-9]/g, '-'); // Sostituisce caratteri non alfanumerici con '-'
 };
 
-// Configurazione Multer per il caricamento dei file
+
+
+
+// **1. Creazione di una nuova categoria**
+router.post('/categories', authenticate, async (req, res) => {
+    try {
+        const { name } = req.body;
+
+        if (!name) {
+            return res.status(400).json({ error: 'Il nome della categoria è obbligatorio.' });
+        }
+
+        const existingCategory = await TokenCategory.findOne({ where: { name } });
+        if (existingCategory) {
+            return res.status(400).json({ error: 'La categoria esiste già.' });
+        }
+
+        const category = await TokenCategory.create({ name });
+        res.status(201).json({ message: 'Categoria creata con successo!', category });
+    } catch (error) {
+        console.error('Errore durante la creazione della categoria:', error);
+        res.status(500).json({ error: 'Errore interno al server.' });
+    }
+});
+
+// **2. Recupera tutte le categorie**
+router.get('/categories', authenticate, async (req, res) => {
+    try {
+        const categories = await TokenCategory.findAll();
+        res.status(200).json({ message: 'Categorie recuperate con successo!', categories });
+    } catch (error) {
+        console.error('Errore durante il recupero delle categorie:', error);
+        res.status(500).json({ error: 'Errore interno al server.' });
+    }
+});
+
+// **3. Aggiorna una categoria esistente**
+router.put('/categories/:id', authenticate, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { name } = req.body;
+
+        const category = await TokenCategory.findByPk(id);
+        if (!category) {
+            return res.status(404).json({ error: 'Categoria non trovata.' });
+        }
+
+        if (name) category.name = name;
+        await category.save();
+
+        res.status(200).json({ message: 'Categoria aggiornata con successo!', category });
+    } catch (error) {
+        console.error('Errore durante l\'aggiornamento della categoria:', error);
+        res.status(500).json({ error: 'Errore interno al server.' });
+    }
+});
+
+// **4. Elimina una categoria**
+router.delete('/categories/:id', authenticate, async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const category = await TokenCategory.findByPk(id);
+        if (!category) {
+            return res.status(404).json({ error: 'Categoria non trovata.' });
+        }
+
+        await category.destroy();
+        res.status(200).json({ message: 'Categoria eliminata con successo.' });
+    } catch (error) {
+        console.error('Errore durante l\'eliminazione della categoria:', error);
+        res.status(500).json({ error: 'Errore interno al server.' });
+    }
+});
+
+// **5. Recupera i token di una categoria specifica**
+router.get('/categories/:id/tokens', authenticate, async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const category = await TokenCategory.findByPk(id, {
+            include: [
+                { model: TokenImage, as: 'tokens', attributes: ['id', 'name', 'url'] },
+            ],
+        });
+
+        if (!category) {
+            return res.status(404).json({ error: 'Categoria non trovata.' });
+        }
+
+        res.status(200).json({
+            message: 'Token associati alla categoria recuperati con successo!',
+            tokens: category.tokens,
+        });
+    } catch (error) {
+        console.error('Errore durante il recupero dei token della categoria:', error);
+        res.status(500).json({ error: 'Errore interno al server.' });
+    }
+});
+
+router.get('/categories/:categoryId/users/:userId/tokens', authenticate, async (req, res) => {
+    try {
+        const { categoryId, userId } = req.params;
+
+        const category = await TokenCategory.findByPk(categoryId, {
+            include: [
+                {
+                    model: TokenImage,
+                    as: 'tokens',
+                    where: { userId }, // Filtra per ID utente
+                    attributes: ['id', 'name', 'url'],
+                },
+            ],
+        });
+
+        if (!category) {
+            return res.status(404).json({ error: 'Categoria non trovata.' });
+        }
+
+        const tokens = category.tokens;
+
+        if (!tokens || tokens.length === 0) {
+            return res.status(404).json({ error: 'Nessun token trovato per questa categoria e utente.' });
+        }
+
+        res.status(200).json({
+            message: 'Token associati alla categoria e all\'utente recuperati con successo!',
+            tokens,
+        });
+    } catch (error) {
+        console.error('Errore durante il recupero dei token per categoria e utente:', error);
+        res.status(500).json({ error: 'Errore interno al server.' });
+    }
+});
+
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         const userFolder = path.join('images/tokens', `${req.user.id}`);
@@ -211,5 +349,39 @@ router.get('/count', authenticate, async (req, res) => {
         res.status(500).json({ error: 'Errore interno al server.' });
     }
 });
+
+
+
+// **Assegna una categoria a un token**
+router.put('/:id/assign-category', authenticate, async (req, res) => {
+    try {
+        const { id } = req.params; // ID del token
+        const { categoryId } = req.body; // ID della categoria da assegnare
+
+        const token = await TokenImage.findOne({ where: { id, userId: req.user.id } });
+        if (!token) {
+            return res.status(404).json({ error: 'Token non trovato.' });
+        }
+
+        const category = await TokenCategory.findByPk(categoryId);
+        if (!category) {
+            return res.status(404).json({ error: 'Categoria non trovata.' });
+        }
+
+        // Aggiorna il token con la categoria assegnata
+        token.categoryId = categoryId;
+        await token.save();
+
+        res.status(200).json({
+            message: 'Categoria assegnata al token con successo.',
+            token,
+        });
+    } catch (error) {
+        console.error('Errore durante l\'assegnazione della categoria al token:', error);
+        res.status(500).json({ error: 'Errore interno al server.' });
+    }
+});
+
+
 
 module.exports = router;

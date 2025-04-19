@@ -50,25 +50,26 @@ html, body {
 
 
 
-
 .gameMapSelector {
     position: fixed;
-    top: -300px; /* Div inizialmente nascosto */
+    top: -400px; /* Div inizialmente nascosto */
     left: 40%;
     transform: translateX(-50%);
     width: 85%;
     max-width: 900px;
     background-color: #333;
-    border: 2px solid #000000;
+    border: 2px solid #000000; /* Bordo visibile */
     border-radius: 10px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     text-align: center;
     transition: top 0.5s ease;
+    height: 400px; /* Altezza fissa */
+    overflow: hidden; /* Previene overflow inatteso */
 }
 
 .gameMapSelectorFlag {
     position: fixed;
-    top: 10px; /* Posiziona la linguetta al centro verticale della pagina */
+    top: 10px; /* Posiziona la linguetta */
     left: calc(50% + 250px); /* Allinea la linguetta a destra del div */
     transform: translateY(-50%);
     width: 50px;
@@ -85,9 +86,12 @@ html, body {
 }
 
 .gameMapSelectorFlag:hover {
-    background-color: #4caf50;
+    background-color: #81c784; /* Cambiato per un effetto hover più visibile */
 }
 
 .gameMapSelectorcontent {
     padding: 20px;
+    height: 400px; /* Altezza fissa */
+    overflow-y: auto; /* Abilita lo scrolling verticale */
+    box-sizing: border-box; /* Include padding e bordo nelle dimensioni */
 }

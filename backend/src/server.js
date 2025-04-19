@@ -58,7 +58,7 @@ app.use('/user', userRoutes);
 app.use('/room', roomRoutes);
 app.use('/tokenimages', tokenImagesRoutes);
 app.use(mapRoutes);
-app.use('/map-tokens', mapTokenRoutes); // Aggiungi questa riga
+app.use('/maptokens', mapTokenRoutes); // Aggiungi questa riga
 
 // Sincronizzazione del database
 sequelize.sync({ force: false })
